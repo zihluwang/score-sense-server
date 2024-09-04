@@ -1,13 +1,13 @@
-package com.onixbyte.scoresense;
+package com.ronglankj.scoresense;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ScoreSenseServerApplication {
+public class ScoreSenseApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ScoreSenseServerApplication.class, args);
+        SpringApplication.run(ScoreSenseApplication.class, args);
     }
 
 }

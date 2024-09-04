@@ -4,8 +4,10 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
 }
 
-group = "com.onixbyte"
-version = "0.0.1-SNAPSHOT"
+val artefactVersion: String by project
+
+group = "com.ronglankj"
+version = artefactVersion
 
 java {
     toolchain {

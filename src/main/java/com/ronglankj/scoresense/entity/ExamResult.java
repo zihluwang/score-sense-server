@@ -23,14 +23,14 @@ public class ExamResult {
     private Long id;
 
     /**
-     * 参加此次考试的用户 ID。
-     */
-    private Long userId;
-
-    /**
      * 此次考试的 ID。
      */
     private Long examId;
+
+    /**
+     * 参加此次考试的用户 ID。
+     */
+    private Long userId;
 
     /**
      * 该用户取得的总成绩，将实际成绩 * 100 存储，如 {@code 100} 分存储为 {@code 10,000}。

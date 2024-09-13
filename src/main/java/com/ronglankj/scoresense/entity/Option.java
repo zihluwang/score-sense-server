@@ -14,14 +14,19 @@ import lombok.*;
 public class Option {
 
     /**
-     * 选项 ID。
+     * 考试 ID
      */
-    private Long id;
+    private Long examId;
 
     /**
      * 题目 ID。
      */
     private Long questionId;
+
+    /**
+     * 选项 ID。
+     */
+    private String id;
 
     /**
      * 选项内容。

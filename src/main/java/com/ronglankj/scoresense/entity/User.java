@@ -40,6 +40,4 @@ public class User {
      */
     private String avatarUrl;
 
-    // 微信登录无需密码
-
 }

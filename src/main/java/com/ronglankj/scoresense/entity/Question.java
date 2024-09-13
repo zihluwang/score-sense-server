@@ -17,14 +17,14 @@ import lombok.*;
 public class Question {
 
     /**
-     * 题目 ID。
-     */
-    private Long id;
-
-    /**
      * 考试 ID。
      */
     private Long examId;
+
+    /**
+     * 题目 ID。
+     */
+    private Long id;
 
     /**
      * 考试类型。

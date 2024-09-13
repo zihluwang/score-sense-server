@@ -18,6 +18,16 @@ import java.time.LocalDateTime;
 public class Answer {
 
     /**
+     * 考试 ID。
+     */
+    private Long examId;
+
+    /**
+     * 试题 ID。
+     */
+    private Long questionId;
+
+    /**
      * 答案 ID。
      */
     private Long id;
@@ -26,11 +36,6 @@ public class Answer {
      * 答题用户 ID。
      */
     private Long userId;
-
-    /**
-     * 试题 ID。
-     */
-    private Long questionId;
 
     /**
      * 用户的答案（多选题时的多个值，以英文逗号 {@code ,} 分隔）。

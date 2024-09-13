@@ -1,28 +1,31 @@
 package com.ronglankj.scoresense.enumeration;
 
+import lombok.Getter;
+
 /**
- * 考试类型
+ * 试题类型
+ *
+ * @author zihluwang
  */
+@Getter
 public enum QuestionType {
 
-    /**
-     * 单选题
-     */
-    SINGLE_CHOICE,
+    VERBAL_REASONING(0, "言语理解与表达"),
+    GENERAL_KNOWLEDGE(1, "常识判断"),
+    QUANTITATIVE_APTITUDE(2, "数量关系"),
+    LOGICAL_REASONING(3, "判断推理"),
+    DATA_INTERPRETATION(4, "资料分析"),
+    ADMINISTRATIVE_ABILITY(5, "行政职业能力测试"),
+    PUBLIC_BASIC_KNOWLEDGE(6, "公共基础知识"),
+    ANALYTICAL_WRITING_AND_POLICY_ARGUMENT(7, "申论");
 
-    /**
-     * 多选题
-     */
-    MULTIPLE_CHOICE,
+    private final Integer value;
 
-    /**
-     * 简答题
-     */
-    SHORT_ANSWER,
+    private final String description;
 
-    /**
-     * 主观题
-     */
-    SUBJECTIVE;
+    QuestionType(Integer value, String description) {
+        this.value = value;
+        this.description = description;
+    }
 
 }

@@ -4,6 +4,9 @@ plugins {
     id("io.spring.dependency-management") version "1.1.6"
 }
 
+/**
+ * Artefact Version
+ */
 val artefactVersion: String by project
 
 group = "com.ronglankj"
@@ -25,7 +28,15 @@ repositories {
     mavenCentral()
 }
 
+
 dependencies {
+    // **************
+    // * 依赖版本定义
+    // **************
+    val mybatisFlexVersion: String by project
+
+    implementation("com.mybatis-flex:mybatis-flex-spring-boot3-starter:$mybatisFlexVersion")
+    implementation("com.zaxxer:HikariCP")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("io.projectreactor:reactor-test")

@@ -5,6 +5,8 @@ import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
+import com.ronglankj.scoresense.model.payload.UserPayload;
+import com.ronglankj.scoresense.view.UserView;
 import lombok.*;
 
 /**
@@ -47,6 +49,11 @@ public class User {
      */
     private String avatarUrl;
 
+    /**
+     * 用户账户是否被封禁。
+     */
+    private Boolean isBlocked;
+
     public static final UserTableDef USER = new UserTableDef();
 
     public static class UserTableDef extends TableDef {
@@ -61,7 +68,9 @@ public class User {
 
         public final QueryColumn AVATAR_URL = new QueryColumn(this, "avatar_url");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, OPEN_ID, USERNAME, PHONE_NUMBER, AVATAR_URL};
+        public final QueryColumn IS_BLOCKED = new QueryColumn(this, "is_blocked");
+
+        public final QueryColumn[] DEFAULT_COLUMNS = {ID, OPEN_ID, USERNAME, PHONE_NUMBER, AVATAR_URL, IS_BLOCKED};
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
@@ -77,6 +86,38 @@ public class User {
             var key = getNameWithSchema() + "." + alias;
             return getCache(key, (k) -> new UserTableDef("", "user", alias));
         }
+    }
+
+    /**
+     * 将持久层对象转换为视图层对象。
+     *
+     * @return 用户视图
+     */
+    public UserView toView() {
+        return UserView.builder()
+                .id(id)
+                .openId(openId)
+                .username(username)
+                .phoneNumber(phoneNumber)
+                .avatarUrl(avatarUrl)
+                .isBlocked(isBlocked)
+                .build();
+    }
+
+    /**
+     * 将实体类转换为 Token 中的载荷。
+     *
+     * @return Token 中的载荷
+     */
+    public UserPayload toPayload() {
+        return UserPayload.builder()
+                .id(id)
+                .openId(openId)
+                .username(username)
+                .phoneNumber(phoneNumber)
+                .avatarUrl(avatarUrl)
+                .isBlocked(isBlocked)
+                .build();
     }
 
 }

@@ -34,7 +34,15 @@ dependencies {
     // * 依赖版本定义
     // **************
     val mybatisFlexVersion: String by project
+    val devkitVersion: String by project
+    val auth0JwtVersion: String by project
 
+    implementation("com.onixbyte:devkit-utils:$devkitVersion")
+    implementation("com.onixbyte:guid:$devkitVersion")
+    implementation("com.auth0:java-jwt:$auth0JwtVersion")
+    implementation("com.onixbyte:simple-jwt-facade:$devkitVersion")
+    implementation("com.onixbyte:simple-jwt-authzero:$devkitVersion")
+    implementation("com.onixbyte:simple-jwt-spring-boot-starter:$devkitVersion")
     implementation("com.mybatis-flex:mybatis-flex-spring-boot3-starter:$mybatisFlexVersion")
     implementation("com.zaxxer:HikariCP")
     implementation("org.springframework.boot:spring-boot-starter-web")

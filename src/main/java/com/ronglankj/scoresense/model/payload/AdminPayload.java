@@ -12,13 +12,13 @@ import lombok.*;
 @EqualsAndHashCode
 public class AdminPayload implements TokenPayload {
 
-    private Long id;
+    private String id;
 
     private String username;
 
     public Admin toPersistent() {
         return Admin.builder()
-                .id(id)
+                .id(Long.parseLong(id))
                 .username(username)
                 .build();
     }

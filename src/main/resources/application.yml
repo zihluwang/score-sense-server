@@ -1,0 +1,5 @@
+onixbyte:
+  simple-jwt:
+    algorithm: hs512
+    secret: wx6e6400d22c0af409e30b9f193124420f2e6772da7bec67ef6772da7bec67ef
+    issuer: ScoreSense

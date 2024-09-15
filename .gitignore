@@ -36,5 +36,4 @@ out/
 ### VS Code ###
 .vscode/
 
-config/*local*.yml
-config/application-wechat.yml
+/config/

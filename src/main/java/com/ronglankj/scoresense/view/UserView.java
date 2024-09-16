@@ -11,6 +11,7 @@ import lombok.Builder;
  * @param phoneNumber 用户手机号码
  * @param avatarUrl   用户头像 URL
  * @param isBlocked   用户是否被封禁
+ * @param token       用户身份令牌
  * @author zihluwang
  */
 @Builder
@@ -20,7 +21,8 @@ public record UserView(
         String username,
         String phoneNumber,
         String avatarUrl,
-        Boolean isBlocked
+        Boolean isBlocked,
+        String token
 ) {
 
 }

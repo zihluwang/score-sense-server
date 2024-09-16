@@ -40,6 +40,11 @@ public class ExamResult {
     private Long userId;
 
     /**
+     * 岗位 ID。
+     */
+    private Long vacancyId;
+
+    /**
      * 该用户取得的总成绩，将实际成绩 * 100 存储，如 {@code 100} 分存储为 {@code 10,000}。
      */
     private Integer totalScore;
@@ -59,13 +64,15 @@ public class ExamResult {
 
         public final QueryColumn USER_ID = new QueryColumn(this, "user_id");
 
+        public final QueryColumn VACANCY_ID = new QueryColumn(this, "vacancy_id");
+
         public final QueryColumn TOTAL_SCORE = new QueryColumn(this, "total_score");
 
         public final QueryColumn COMPLETED_AT = new QueryColumn(this, "completed_at");
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, EXAM_ID, USER_ID, TOTAL_SCORE, COMPLETED_AT};
+        public final QueryColumn[] DEFAULT_COLUMNS = {ID, EXAM_ID, USER_ID, VACANCY_ID, TOTAL_SCORE, COMPLETED_AT};
 
         private ExamResultTableDef() {
             super("", "exam_result");

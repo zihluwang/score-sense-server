@@ -4,7 +4,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.onixbyte.simplejwt.TokenResolver;
 import com.ronglankj.scoresense.context.UserContext;
-import com.ronglankj.scoresense.entity.User;
 import com.ronglankj.scoresense.holder.UserContextHolder;
 import com.ronglankj.scoresense.model.payload.UserPayload;
 import jakarta.servlet.http.HttpServletRequest;

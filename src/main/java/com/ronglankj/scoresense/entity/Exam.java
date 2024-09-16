@@ -37,6 +37,16 @@ public class Exam {
      */
     private String description;
 
+    /**
+     * 举办考试省份。
+     */
+    private String province;
+
+    /**
+     * 举办考试城市。
+     */
+    private String prefecture;
+
     public static final ExamTableDef EXAM = new ExamTableDef();
 
     public static class ExamTableDef extends TableDef {
@@ -47,9 +57,13 @@ public class Exam {
 
         public final QueryColumn DESCRIPTION = new QueryColumn(this, "description");
 
+        public final QueryColumn PROVINCE = new QueryColumn(this, "province");
+
+        public final QueryColumn PREFECTURE = new QueryColumn(this, "prefecture");
+
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, NAME, DESCRIPTION};
+        public final QueryColumn[] DEFAULT_COLUMNS = {ID, NAME, DESCRIPTION, PROVINCE, PREFECTURE};
 
         private ExamTableDef() {
             super("", "exam");

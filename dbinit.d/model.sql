@@ -86,18 +86,30 @@ COMMENT ON COLUMN "question"."question_text" IS '题干';
 COMMENT ON COLUMN "question"."max_score" IS '题目满分，将实际成绩 * 100 存储，如 100 存储为 10,000';
 COMMENT ON TABLE "question" IS '试题';
 
-CREATE TABLE "user"
+-- auto-generated definition
+create table "user"
 (
-    "id"           int8         NOT NULL,
-    "open_id"      char(28)     NOT NULL,
-    "username"     varchar(255) NOT NULL,
-    "phone_number" char(11)     NOT NULL,
-    "avatar_url"   varchar(255) NOT NULL,
-    PRIMARY KEY ("id", "open_id")
+    id           bigint                not null
+        primary key,
+    open_id      char(28)              not null,
+    username     varchar(255)          not null,
+    phone_number char(11)              not null,
+    avatar_url   varchar(255)          not null,
+    is_blocked   boolean default false not null
 );
-COMMENT ON COLUMN "user"."id" IS '用户 ID';
-COMMENT ON COLUMN "user"."open_id" IS '用户微信 ID';
-COMMENT ON COLUMN "user"."username" IS '用户名';
-COMMENT ON COLUMN "user"."phone_number" IS '用户联系电话';
-COMMENT ON COLUMN "user"."avatar_url" IS '用户头像地址';
+
+comment on column "user".id is '用户 ID';
+comment on column "user".open_id is '用户微信 ID';
+comment on column "user".username is '用户名';
+comment on column "user".phone_number is '用户联系电话';
+comment on column "user".avatar_url is '用户头像地址';
+comment on column "user".is_blocked is '用户是否被封禁';
+
+alter table "user"
+    owner to postgres;
+
+create unique index user_open_id_uindex
+    on "user" (open_id);
+
+
 

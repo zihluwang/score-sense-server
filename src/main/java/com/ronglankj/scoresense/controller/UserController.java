@@ -10,8 +10,6 @@ import com.ronglankj.scoresense.service.UserService;
 import com.ronglankj.scoresense.view.UserView;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +45,7 @@ public class UserController {
 
         // 根据微信用户 OpenID 查询用户数据库信息
         var user = userService.getUserByOpenId(weChatUserInfo.openId());
+
         if (Objects.isNull(user)) { // 用户信息为空，注册账户
             var userId = userIdCreator.nextId();
             user = User.builder()
@@ -60,7 +59,9 @@ public class UserController {
             userService.createUser(user);
         }
 
+        // 创建用户令牌
         var token = tokenResolver.createToken(Duration.ofDays(30), user.getUsername(), "ScoreSense-Miniapp-User", user.toPayload());
+        // 返回用户信息
         return UserView.builder()
                 .id(user.getId())
                 .openId(user.getOpenId())

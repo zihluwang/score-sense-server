@@ -5,7 +5,6 @@ import com.onixbyte.guid.GuidCreator;
 import com.onixbyte.simplejwt.TokenResolver;
 import com.ronglankj.scoresense.entity.User;
 import com.ronglankj.scoresense.model.request.UserLoginOrRegisterRequest;
-import com.ronglankj.scoresense.property.WeChatProperty;
 import com.ronglankj.scoresense.service.UserService;
 import com.ronglankj.scoresense.view.UserView;
 import lombok.extern.slf4j.Slf4j;
@@ -24,16 +23,13 @@ import java.util.Objects;
 public class UserController {
 
     private final TokenResolver<DecodedJWT> tokenResolver;
-    private final WeChatProperty weChatProperty;
     private final UserService userService;
     private final GuidCreator<Long> userIdCreator;
 
     public UserController(TokenResolver<DecodedJWT> tokenResolver,
-                          WeChatProperty weChatProperty,
                           UserService userService,
                           @Qualifier("userIdCreator") GuidCreator<Long> userIdCreator) {
         this.tokenResolver = tokenResolver;
-        this.weChatProperty = weChatProperty;
         this.userService = userService;
         this.userIdCreator = userIdCreator;
     }

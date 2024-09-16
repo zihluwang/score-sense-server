@@ -113,10 +113,6 @@ public class User {
         return UserPayload.builder()
                 .id(id)
                 .openId(openId)
-                .username(username)
-                .phoneNumber(phoneNumber)
-                .avatarUrl(avatarUrl)
-                .isBlocked(isBlocked)
                 .build();
     }
 

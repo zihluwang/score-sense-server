@@ -13,6 +13,8 @@ import lombok.Setter;
 @Builder
 public class UserContext {
 
-    private User user;
+    private Long id;
+
+    private String openId;
 
 }

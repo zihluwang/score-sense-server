@@ -33,15 +33,16 @@ public class UserInterceptor implements HandlerInterceptor {
 
         try {
             // 将 token 解析为 User
-            var user = tokenResolver.extract(token, UserPayload.class);
+            var userPayload = tokenResolver.extract(token, UserPayload.class);
 
             // 将 User 存放至 UserContext 中
-            var userCtx = UserContext.builder()
-                    .user(user.toPersistent())
+            var userContext = UserContext.builder()
+                    .id(userPayload.getId())
+                    .openId(userPayload.getOpenId())
                     .build();
 
             // 将 UserContext 存放至 UserContextHolder 中
-            UserContextHolder.setUserContext(userCtx);
+            UserContextHolder.setUserContext(userContext);
         } catch (JWTVerificationException verificationException) {
             log.error("无法解析用户身份令牌。", verificationException);
         }

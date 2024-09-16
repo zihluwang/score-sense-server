@@ -15,6 +15,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.Map;
 
+/**
+ * 用户服务。
+ *
+ * @author zihluwang
+ */
 @Slf4j
 @Service
 public class UserService {
@@ -24,16 +29,25 @@ public class UserService {
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
 
-    public UserService(
-            WeChatProperty weChatProperty, WebClient weChatClient, ObjectMapper jacksonObjectMapper, UserRepository userRepository) {
+    public UserService(WeChatProperty weChatProperty,
+                       WebClient weChatClient,
+                       ObjectMapper jacksonObjectMapper,
+                       UserRepository userRepository) {
         this.weChatProperty = weChatProperty;
         this.weChatClient = weChatClient;
         this.objectMapper = jacksonObjectMapper;
         this.userRepository = userRepository;
     }
 
+    /**
+     * 请求微信 API 获取微信用户 ID。
+     *
+     * @param code 微信用户一次性登录代码
+     * @return 用户信息
+     */
     public WeChatUserInfo getWeChatUserInfo(String code) {
         try {
+            // 发送获取用户身份信息的请求
             var result = weChatClient.get()
                     .uri((uriBuilder) -> uriBuilder
                             .path("/sns/jscode2session")
@@ -43,8 +57,10 @@ public class UserService {
                             .queryParam("grant_type", "authorization_code")
                             .build())
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(String.class) // 微信的响应中，Content-Type 被设置为 text/plain
                     .block();
+
+            // 由于微信接口中命名不符合 Java 中的参数命名规范，因此将数据转储为 Map<String, String>
             var resultMap = objectMapper.readValue(result, new TypeReference<Map<String, String>>() {
             });
             return WeChatUserInfo.builder()
@@ -56,10 +72,22 @@ public class UserService {
         }
     }
 
+    /**
+     * 根据用户的微信 OpenID 查找用户信息。
+     *
+     * @param openId 用户的微信 Open ID
+     * @return 查找到的用户信息，如果该微信用户未注册账户则返回 {@code null}
+     */
     public User getUserByOpenId(String openId) {
         return userRepository.selectOneByCondition(User.USER.OPEN_ID.eq(openId));
     }
 
+    /**
+     * 创建用户。
+     *
+     * @param user 用户信息
+     * @return {@code 1} 代表用户创建成功，{@code 0} 代表用户创建失败
+     */
     public int createUser(User user) {
         return userRepository.insert(user);
     }

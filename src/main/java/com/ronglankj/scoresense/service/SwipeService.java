@@ -2,12 +2,13 @@ package com.ronglankj.scoresense.service;
 
 import com.ronglankj.scoresense.entity.Swipe;
 import com.ronglankj.scoresense.repository.SwipeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.spel.ast.Literal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class SwipeService {
 

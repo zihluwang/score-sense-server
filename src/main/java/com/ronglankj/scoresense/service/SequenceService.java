@@ -2,12 +2,14 @@ package com.ronglankj.scoresense.service;
 
 import com.ronglankj.scoresense.entity.Sequence;
 import com.ronglankj.scoresense.repository.SequenceRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class SequenceService {
 

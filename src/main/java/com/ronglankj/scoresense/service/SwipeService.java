@@ -12,12 +12,12 @@ import java.util.List;
 @Service
 public class SwipeService {
 
-    private final SwipeRepository repository;
+    private final SwipeRepository swipeRepository;
     private final SequenceService sequenceService;
 
     @Autowired
-    public SwipeService(SwipeRepository repository, SequenceService sequenceService) {
-        this.repository = repository;
+    public SwipeService(SwipeRepository swipeRepository, SequenceService sequenceService) {
+        this.swipeRepository = swipeRepository;
         this.sequenceService = sequenceService;
     }
 
@@ -32,11 +32,10 @@ public class SwipeService {
      * @return 影响的行数
      */
     public int addSwipe(String imageUrl) {
-        var swipe = Swipe.builder()
+        return swipeRepository.insert(Swipe.builder()
                 .sequence(sequenceService.getNextSequence(SEQUENCE_KEY))
                 .imageUrl(imageUrl)
-                .build();
-        return repository.insert(swipe);
+                .build());
     }
 
     /**
@@ -48,7 +47,7 @@ public class SwipeService {
         // 获取最大序列号，为下一可用序列号 - 1
         var maxSequence = sequenceService.getNextSequence(SEQUENCE_KEY) - 1;
         // 删除轮播图
-        repository.deleteByCondition(SWIPE.SEQUENCE.eq(maxSequence));
+        swipeRepository.deleteByCondition(SWIPE.SEQUENCE.eq(maxSequence));
         // 序列号自减
         sequenceService.releaseLargestSequence(SEQUENCE_KEY);
         return 1;
@@ -62,9 +61,9 @@ public class SwipeService {
      * @return 受影响的行数
      */
     public int replaceSwipe(Integer sequence, String imageUrl) {
-        var isSwipeExistent = repository.selectCountByCondition(SWIPE.SEQUENCE.eq(sequence)) == 1;
+        var isSwipeExistent = swipeRepository.selectCountByCondition(SWIPE.SEQUENCE.eq(sequence)) == 1;
         if (isSwipeExistent) {
-            return repository.update(Swipe.builder()
+            return swipeRepository.update(Swipe.builder()
                     .sequence(sequence)
                     .imageUrl(imageUrl)
                     .build());
@@ -79,7 +78,7 @@ public class SwipeService {
      * @return 所有轮播图信息
      */
     public List<Swipe> getSwipes() {
-        return repository.selectAll();
+        return swipeRepository.selectAll();
     }
 
 }

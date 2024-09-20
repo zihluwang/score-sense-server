@@ -63,6 +63,13 @@ public class UserService {
             // 由于微信接口中命名不符合 Java 中的参数命名规范，因此将数据转储为 Map<String, String>
             var resultMap = objectMapper.readValue(result, new TypeReference<Map<String, String>>() {
             });
+
+            // errorCode == -1: 系统繁忙，稍后再试
+            // errorCode == 0: 请求成功
+            // errorCode == 40029: code 无效
+            // errorCode == 45011: 频率限制，每个用户1分钟限量100次
+            // errorCode == 40226: 高风险等级用户，小程序登录拦截
+
             return WeChatUserInfo.builder()
                     .openId(resultMap.get("openid"))
                     .sessionKey(resultMap.get("session_key"))

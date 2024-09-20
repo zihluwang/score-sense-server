@@ -3,7 +3,10 @@ package com.ronglankj.scoresense.service;
 import com.ronglankj.scoresense.entity.Swipe;
 import com.ronglankj.scoresense.repository.SwipeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.spel.ast.Literal;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class SwipeService {
@@ -67,6 +70,15 @@ public class SwipeService {
         } else {
             return 0;
         }
+    }
+
+    /**
+     * 获取所有轮播图。
+     *
+     * @return 所有轮播图信息
+     */
+    public List<Swipe> getSwipes() {
+        return repository.selectAll();
     }
 
 }

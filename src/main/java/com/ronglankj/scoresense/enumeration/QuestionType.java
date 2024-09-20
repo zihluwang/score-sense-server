@@ -1,5 +1,6 @@
 package com.ronglankj.scoresense.enumeration;
 
+import com.mybatisflex.annotation.EnumValue;
 import lombok.Getter;
 
 /**
@@ -19,6 +20,7 @@ public enum QuestionType {
     PUBLIC_BASIC_KNOWLEDGE(6, "公共基础知识"),
     ANALYTICAL_WRITING_AND_POLICY_ARGUMENT(7, "申论");
 
+    @EnumValue
     private final Integer value;
 
     private final String description;

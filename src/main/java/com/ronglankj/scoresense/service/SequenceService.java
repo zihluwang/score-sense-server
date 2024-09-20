@@ -38,10 +38,10 @@ public class SequenceService {
     }
 
     /**
-     * 获取下一个可用的序号。
+     * 删除最大的序号。
      *
      * @param key 序号 key
-     * @return 下一个可用序号，如果该序列还没有创建则返回 {@code -1}
+     * @return 删除最大序号后的下一个可用序号
      */
     public Integer releaseLargestSequence(String key) {
         var seq = repository.selectOneByCondition(SEQUENCE.KEY.eq(key));

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -45,14 +46,16 @@ public class SwipeService {
      * 添加轮播图。
      *
      * @param name     图片名称
+     * @param sequence 图片次序，{@code null} 时自动填充为最后的次序
      * @param imageUrl 图片 URL
      * @return 影响的行数
      */
-    public int addSwipe(String name, String imageUrl) {
+    public int addSwipe(String name, Integer sequence, String imageUrl) {
+        var swipeId = swipeIdCreator.nextId();
         return swipeRepository.insert(Swipe.builder()
-                .id(swipeIdCreator.nextId())
-                .name(name)
-                .sequence(sequenceService.getNextSequence(SEQUENCE_KEY))
+                .id(swipeId)
+                .name(Optional.ofNullable(name).filter(String::isBlank).orElse("图片-%d".formatted(swipeId)))
+                .sequence(Optional.ofNullable(sequence).orElse(sequenceService.getNextSequence(SEQUENCE_KEY)))
                 .imageUrl(imageUrl)
                 .build());
     }

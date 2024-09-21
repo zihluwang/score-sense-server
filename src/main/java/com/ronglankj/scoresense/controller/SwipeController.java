@@ -5,11 +5,13 @@ import com.ronglankj.scoresense.entity.Swipe;
 import com.ronglankj.scoresense.exception.BaseBizException;
 import com.ronglankj.scoresense.model.request.CreateSwipeRequest;
 import com.ronglankj.scoresense.model.request.UpdateSwipeRequest;
-import com.ronglankj.scoresense.service.SequenceService;
+import com.ronglankj.scoresense.model.response.ActionResponse;
 import com.ronglankj.scoresense.service.SwipeService;
+import com.ronglankj.scoresense.util.DateTimeUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,6 +49,12 @@ public class SwipeController {
         return swipeService.updateSwipe(request);
     }
 
-
+    @DeleteMapping("/{swipeId}")
+    public ActionResponse deleteSwipe(@PathVariable Long swipeId) {
+        swipeService.removeSwipe(swipeId);
+        return ActionResponse.builder()
+                .timestamp(DateTimeUtils.toInstant(LocalDateTime.now()))
+                .message("删除成功。").build();
+    }
 
 }

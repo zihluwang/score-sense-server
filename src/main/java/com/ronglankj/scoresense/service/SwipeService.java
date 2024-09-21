@@ -2,10 +2,13 @@ package com.ronglankj.scoresense.service;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.update.UpdateWrapper;
+import com.mybatisflex.core.util.UpdateEntity;
 import com.onixbyte.guid.GuidCreator;
 import com.ronglankj.scoresense.config.ConcurrentConfig;
 import com.ronglankj.scoresense.entity.Swipe;
 import com.ronglankj.scoresense.exception.BaseBizException;
+import com.ronglankj.scoresense.model.request.UpdateSwipeRequest;
 import com.ronglankj.scoresense.repository.SwipeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,6 +129,22 @@ public class SwipeService {
     public Page<Swipe> getSwipes(Integer currentPage, Integer pageSize) {
         return swipeRepository.paginate(currentPage, pageSize, QueryWrapper.create()
                 .orderBy(SWIPE.ID, true));
+    }
+
+    public Swipe updateSwipe(UpdateSwipeRequest request) {
+        var swipe = UpdateEntity.of(Swipe.class, request.id());
+        Optional.ofNullable(request.name())
+                .ifPresent(swipe::setName);
+        Optional.ofNullable(request.sequence())
+                .ifPresent(swipe::setSequence);
+        Optional.ofNullable(request.imageUrl())
+                .ifPresent(swipe::setImageUrl);
+        var updatedRowCount = swipeRepository.update(swipe);
+        if (updatedRowCount > 0) {
+            return swipeRepository.selectOneByCondition(SWIPE.ID.eq(request.id()));
+        } else {
+            return null;
+        }
     }
 
 }

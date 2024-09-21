@@ -4,6 +4,7 @@ import com.mybatisflex.core.paginate.Page;
 import com.ronglankj.scoresense.entity.Swipe;
 import com.ronglankj.scoresense.exception.BaseBizException;
 import com.ronglankj.scoresense.model.request.CreateSwipeRequest;
+import com.ronglankj.scoresense.model.request.UpdateSwipeRequest;
 import com.ronglankj.scoresense.service.SequenceService;
 import com.ronglankj.scoresense.service.SwipeService;
 import org.springframework.http.HttpStatus;
@@ -17,11 +18,9 @@ import java.util.Objects;
 public class SwipeController {
 
     private final SwipeService swipeService;
-    private final SequenceService sequenceService;
 
-    public SwipeController(SwipeService swipeService, SequenceService sequenceService) {
+    public SwipeController(SwipeService swipeService) {
         this.swipeService = swipeService;
-        this.sequenceService = sequenceService;
     }
 
     @GetMapping("/enabled")
@@ -42,5 +41,12 @@ public class SwipeController {
         }
         return swipeService.addSwipe(request.name(), request.sequence(), request.imageUrl());
     }
+
+    @PatchMapping("/")
+    public Swipe updateSwipe(@RequestBody UpdateSwipeRequest request) {
+        return swipeService.updateSwipe(request);
+    }
+
+
 
 }

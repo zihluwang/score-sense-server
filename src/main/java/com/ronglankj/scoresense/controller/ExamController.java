@@ -2,6 +2,7 @@ package com.ronglankj.scoresense.controller;
 
 import com.mybatisflex.core.paginate.Page;
 import com.ronglankj.scoresense.entity.Exam;
+import com.ronglankj.scoresense.entity.ExamType;
 import com.ronglankj.scoresense.model.request.CreateExamRequest;
 import com.ronglankj.scoresense.service.ExamService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,18 @@ public class ExamController {
     public ResponseEntity<Void> createExam(@ModelAttribute CreateExamRequest request) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(null);
+    }
+
+    @GetMapping("/types")
+    public List<ExamType> getAllExamTypes() {
+        return examService.getAllExamTypes();
+    }
+
+    @GetMapping("/types/{examTypeId}")
+    public Page<Exam> getExamByType(@PathVariable Integer examTypeId,
+                                    @RequestParam(defaultValue = "1") Integer currentPage,
+                                    @RequestParam(defaultValue = "10") Integer pageSize) {
+        return examService.getExamsByExamType(examTypeId, currentPage, pageSize);
     }
 
 }

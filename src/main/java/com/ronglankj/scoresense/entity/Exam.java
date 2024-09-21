@@ -33,6 +33,11 @@ public class Exam {
     private String name;
 
     /**
+     * 考试类型。
+     */
+    private Integer type;
+
+    /**
      * 考试描述。
      */
     private String description;
@@ -54,6 +59,8 @@ public class Exam {
         public final QueryColumn ID = new QueryColumn(this, "id");
 
         public final QueryColumn NAME = new QueryColumn(this, "name");
+
+        public final QueryColumn TYPE = new QueryColumn(this, "type");
 
         public final QueryColumn DESCRIPTION = new QueryColumn(this, "description");
 

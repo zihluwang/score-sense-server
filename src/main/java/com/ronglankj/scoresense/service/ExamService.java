@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 考试业务。
@@ -56,8 +57,16 @@ public class ExamService {
      *
      * @return 根据考试类型分类的考试列表分页数据
      */
-    public Page<Exam> getExamsByExamType(Integer examType, Integer currentPage, Integer pageSize) {
-        return examRepository.paginate(currentPage, pageSize, Exam.EXAM.TYPE.eq(examType));
+    public Page<Exam> getExamsByExamType(Integer examType, String divisionCode, Integer currentPage, Integer pageSize) {
+        var queryCondition = Exam.EXAM.TYPE.eq(examType);
+        if (Objects.nonNull(divisionCode) && !divisionCode.isBlank()) {
+            if (divisionCode.length() == 2) {
+                queryCondition.and(Exam.EXAM.PROVINCE.eq(divisionCode));
+            } else if (divisionCode.length() == 4) {
+                queryCondition.and(Exam.EXAM.PREFECTURE.eq(divisionCode));
+            }
+        }
+        return examRepository.paginate(currentPage, pageSize, queryCondition);
     }
 
 }

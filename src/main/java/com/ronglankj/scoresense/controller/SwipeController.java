@@ -1,20 +1,16 @@
 package com.ronglankj.scoresense.controller;
 
 import com.mybatisflex.core.paginate.Page;
-import com.onixbyte.guid.GuidCreator;
 import com.ronglankj.scoresense.entity.Swipe;
 import com.ronglankj.scoresense.exception.BaseBizException;
 import com.ronglankj.scoresense.model.request.CreateSwipeRequest;
 import com.ronglankj.scoresense.service.SequenceService;
 import com.ronglankj.scoresense.service.SwipeService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/swipes")
@@ -40,12 +36,11 @@ public class SwipeController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<Void> createSwipe(@RequestBody CreateSwipeRequest request) {
+    public Swipe createSwipe(@RequestBody CreateSwipeRequest request) {
         if (Objects.isNull(request.imageUrl()) || request.imageUrl().isBlank()) {
             throw new BaseBizException(HttpStatus.BAD_REQUEST, "图片链接不能为空！");
         }
-        swipeService.addSwipe(request.name(), request.sequence(), request.imageUrl());
-        return ResponseEntity.ok(null);
+        return swipeService.addSwipe(request.name(), request.sequence(), request.imageUrl());
     }
 
 }

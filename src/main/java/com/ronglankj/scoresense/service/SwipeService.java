@@ -48,16 +48,18 @@ public class SwipeService {
      * @param name     图片名称
      * @param sequence 图片次序，{@code null} 时自动填充为最后的次序
      * @param imageUrl 图片 URL
-     * @return 影响的行数
+     * @return 被存储的轮播图
      */
-    public int addSwipe(String name, Integer sequence, String imageUrl) {
+    public Swipe addSwipe(String name, Integer sequence, String imageUrl) {
         var swipeId = swipeIdCreator.nextId();
-        return swipeRepository.insert(Swipe.builder()
+        var swipe = Swipe.builder()
                 .id(swipeId)
                 .name(Optional.ofNullable(name).filter(String::isBlank).orElse("图片-%d".formatted(swipeId)))
                 .sequence(Optional.ofNullable(sequence).orElse(sequenceService.getNextSequence(SEQUENCE_KEY)))
                 .imageUrl(imageUrl)
-                .build());
+                .build();
+        swipeRepository.insert(swipe);
+        return swipe;
     }
 
     /**

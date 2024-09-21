@@ -1,6 +1,7 @@
 package com.ronglankj.scoresense.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.ronglankj.scoresense.entity.Exam;
 import com.ronglankj.scoresense.entity.ExamType;
 import com.ronglankj.scoresense.model.request.CreateExamRequest;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/exams")
@@ -41,10 +43,11 @@ public class ExamController {
     }
 
     @GetMapping("/types/{examTypeId}")
-    public Page<Exam> getExamByType(@PathVariable Integer examTypeId,
-                                    @RequestParam(defaultValue = "1") Integer currentPage,
-                                    @RequestParam(defaultValue = "10") Integer pageSize) {
-        return examService.getExamsByExamType(examTypeId, currentPage, pageSize);
+    public Page<Exam> getExamByType(@RequestParam(defaultValue = "1") Integer currentPage,
+                                    @RequestParam(defaultValue = "10") Integer pageSize,
+                                    @PathVariable Integer examTypeId,
+                                    @RequestParam(required = false) String divisionCode) {
+        return examService.getExamsByExamType(examTypeId, divisionCode, currentPage, pageSize);
     }
 
 }

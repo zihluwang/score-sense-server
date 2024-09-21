@@ -27,18 +27,12 @@ public class AdminController {
 
     private final TokenResolver<DecodedJWT> tokenResolver;
     private final AdminService adminService;
-    private final GuidCreator<Long> adminIdCreator;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public AdminController(TokenResolver<DecodedJWT> tokenResolver,
-                           AdminService adminService,
-                           @Qualifier("adminIdCreator") GuidCreator<Long> adminIdCreator,
-                           PasswordEncoder passwordEncoder) {
+                           AdminService adminService) {
         this.tokenResolver = tokenResolver;
         this.adminService = adminService;
-        this.adminIdCreator = adminIdCreator;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/login")

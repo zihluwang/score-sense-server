@@ -1,17 +1,12 @@
 package com.ronglankj.scoresense.controller;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.onixbyte.guid.GuidCreator;
-import com.onixbyte.guid.impl.SnowflakeGuidCreator;
 import com.onixbyte.simplejwt.TokenResolver;
-import com.ronglankj.scoresense.entity.Admin;
 import com.ronglankj.scoresense.model.request.AdminLoginRequest;
 import com.ronglankj.scoresense.model.request.CreateAdminRequest;
-import com.ronglankj.scoresense.security.PasswordEncoder;
 import com.ronglankj.scoresense.service.AdminService;
 import com.ronglankj.scoresense.view.AdminView;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

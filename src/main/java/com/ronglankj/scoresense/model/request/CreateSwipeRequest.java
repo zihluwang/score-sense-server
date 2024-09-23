@@ -6,6 +6,6 @@ import lombok.Builder;
 public record CreateSwipeRequest(
         String name,
         Integer sequence,
-        String imageUrl
+        Long imageId
 ) {
 }

@@ -50,7 +50,7 @@ public class UserController {
                     .isBlocked(false)
                     .openId(weChatUserInfo.openId())
                     .phoneNumber("")
-                    .avatarUrl("") // todo 设置一个默认的头像地址
+                    .avatarId(0L)
                     .build();
             userService.createUser(user);
         }
@@ -63,7 +63,7 @@ public class UserController {
                 .openId(user.getOpenId())
                 .username(user.getUsername())
                 .phoneNumber(user.getPhoneNumber())
-                .avatarUrl(user.getAvatarUrl())
+                .avatarId(user.getAvatarId())
                 .isBlocked(user.getIsBlocked())
                 .token(token)
                 .build();

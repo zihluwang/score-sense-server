@@ -1,6 +1,7 @@
 package com.ronglankj.scoresense.config;
 
 import com.ronglankj.scoresense.interceptor.AdminInterceptor;
+import com.ronglankj.scoresense.interceptor.CommonInterceptor;
 import com.ronglankj.scoresense.interceptor.UserInterceptor;
 import com.ronglankj.scoresense.property.CorsProperty;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ public class WebConfig implements WebMvcConfigurer {
     private AdminInterceptor adminInterceptor;
 
     private CorsProperty corsProperty;
+    private CommonInterceptor commonInterceptor;
 
     @Autowired
     public void setUserInterceptor(UserInterceptor userInterceptor) {
@@ -40,6 +42,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(commonInterceptor)
+                .addPathPatterns("/**");
+
         registry.addInterceptor(userInterceptor)
                 .addPathPatterns("/users/**")
                 .excludePathPatterns("/users/login");
@@ -59,5 +64,10 @@ public class WebConfig implements WebMvcConfigurer {
                         .toArray(String[]::new))
                 .allowedHeaders(corsProperty.getAllowedHeaders())
                 .exposedHeaders(corsProperty.getExposedHeaders());
+    }
+
+    @Autowired
+    public void setCommonInterceptor(CommonInterceptor commonInterceptor) {
+        this.commonInterceptor = commonInterceptor;
     }
 }

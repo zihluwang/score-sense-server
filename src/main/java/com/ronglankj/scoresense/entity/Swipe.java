@@ -38,7 +38,7 @@ public class Swipe {
     /**
      * 图片 URL。
      */
-    private String imageUrl;
+    private Long imageId;
 
     public static final SwipeTableDef SWIPE = new SwipeTableDef();
 
@@ -49,11 +49,11 @@ public class Swipe {
 
         public final QueryColumn SEQUENCE = new QueryColumn(this, "sequence");
 
-        public final QueryColumn IMAGE_URL = new QueryColumn(this, "image_url");
+        public final QueryColumn IMAGE_ID = new QueryColumn(this, "image_url");
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, NAME, SEQUENCE, IMAGE_URL};
+        public final QueryColumn[] DEFAULT_COLUMNS = {ID, NAME, SEQUENCE, IMAGE_ID};
 
         private SwipeTableDef() {
             super("", "swipe");

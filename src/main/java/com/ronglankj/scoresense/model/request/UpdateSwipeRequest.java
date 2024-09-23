@@ -7,6 +7,6 @@ public record UpdateSwipeRequest(
         Long id,
         String name,
         Integer sequence,
-        String imageUrl
+        Long imageId
 ) {
 }

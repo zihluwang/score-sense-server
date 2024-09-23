@@ -47,7 +47,7 @@ public class User {
     /**
      * 用户头像 URL。
      */
-    private String avatarUrl;
+    private Long avatarId;
 
     /**
      * 用户账户是否被封禁。
@@ -66,11 +66,11 @@ public class User {
 
         public final QueryColumn PHONE_NUMBER = new QueryColumn(this, "phone_number");
 
-        public final QueryColumn AVATAR_URL = new QueryColumn(this, "avatar_url");
+        public final QueryColumn AVATAR_ID = new QueryColumn(this, "avatar_id");
 
         public final QueryColumn IS_BLOCKED = new QueryColumn(this, "is_blocked");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, OPEN_ID, USERNAME, PHONE_NUMBER, AVATAR_URL, IS_BLOCKED};
+        public final QueryColumn[] DEFAULT_COLUMNS = {ID, OPEN_ID, USERNAME, PHONE_NUMBER, AVATAR_ID, IS_BLOCKED};
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
@@ -99,7 +99,7 @@ public class User {
                 .openId(openId)
                 .username(username)
                 .phoneNumber(phoneNumber)
-                .avatarUrl(avatarUrl)
+                .avatarId(avatarId)
                 .isBlocked(isBlocked)
                 .build();
     }

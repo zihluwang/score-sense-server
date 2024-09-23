@@ -45,6 +45,11 @@ public class Question {
     private String questionText;
 
     /**
+     * 题目图像 ID。
+     */
+    private Long imageId;
+
+    /**
      * 题目满分，将实际成绩 * 100 存储，如 {@code 100} 分存储为 {@code 10,000}。
      */
     private Integer maxScore;
@@ -61,9 +66,11 @@ public class Question {
 
         public final QueryColumn QUESTION_TEXT = new QueryColumn(this, "question_text");
 
+        public final QueryColumn IMAGE_ID = new QueryColumn(this, "image_id");
+
         public final QueryColumn MAX_SCORE = new QueryColumn(this, "max_score");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, ID, TYPE, QUESTION_TEXT, MAX_SCORE};
+        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, ID, TYPE, QUESTION_TEXT, IMAGE_ID, MAX_SCORE};
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 

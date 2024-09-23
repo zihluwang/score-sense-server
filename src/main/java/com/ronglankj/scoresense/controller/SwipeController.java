@@ -38,10 +38,10 @@ public class SwipeController {
 
     @PostMapping("/")
     public Swipe createSwipe(@RequestBody CreateSwipeRequest request) {
-        if (Objects.isNull(request.imageUrl()) || request.imageUrl().isBlank()) {
-            throw new BaseBizException(HttpStatus.BAD_REQUEST, "图片链接不能为空！");
+        if (Objects.isNull(request.imageId())) {
+            throw new BaseBizException(HttpStatus.BAD_REQUEST, "图片ID不能为空！");
         }
-        return swipeService.addSwipe(request.name(), request.sequence(), request.imageUrl());
+        return swipeService.addSwipe(request.name(), request.sequence(), request.imageId());
     }
 
     @PatchMapping("/")

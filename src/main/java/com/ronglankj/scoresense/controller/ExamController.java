@@ -5,11 +5,16 @@ import com.ronglankj.scoresense.entity.Exam;
 import com.ronglankj.scoresense.entity.ExamType;
 import com.ronglankj.scoresense.model.request.CreateExamRequest;
 import com.ronglankj.scoresense.model.request.CreateExamTypeRequest;
+import com.ronglankj.scoresense.model.request.UpdateExamTypeRequest;
+import com.ronglankj.scoresense.model.response.ActionResponse;
 import com.ronglankj.scoresense.service.ExamService;
+import com.ronglankj.scoresense.util.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/exams")
@@ -70,6 +75,20 @@ public class ExamController {
     @PostMapping("/types")
     public ExamType createExamType(@RequestBody CreateExamTypeRequest request) {
         return examService.createExamType(request.name());
+    }
+
+    @PatchMapping("/types")
+    public ExamType updateExamType(@RequestBody UpdateExamTypeRequest request) {
+        return examService.updateExamType(request);
+    }
+
+    @DeleteMapping("/types/{typeId}")
+    public ActionResponse deleteExamType(@PathVariable Integer typeId) {
+        examService.deleteExamType(typeId);
+        return ActionResponse.builder()
+                .message("考试类型删除成功！")
+                .timestamp(DateTimeUtils.toInstant(LocalDateTime.now()))
+                .build();
     }
 
 }

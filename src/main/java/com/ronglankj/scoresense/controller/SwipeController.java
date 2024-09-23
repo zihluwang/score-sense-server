@@ -1,7 +1,9 @@
 package com.ronglankj.scoresense.controller;
 
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.ronglankj.scoresense.entity.Swipe;
+import com.ronglankj.scoresense.enumeration.SwipeStatus;
 import com.ronglankj.scoresense.exception.BaseBizException;
 import com.ronglankj.scoresense.model.request.CreateSwipeRequest;
 import com.ronglankj.scoresense.model.request.UpdateSwipeRequest;
@@ -32,8 +34,10 @@ public class SwipeController {
 
     @GetMapping("/")
     public Page<Swipe> getSwipes(@RequestParam(defaultValue = "1") Integer currentPage,
-                                 @RequestParam(defaultValue = "10") Integer pageSize) {
-        return swipeService.getSwipes(currentPage, pageSize);
+                                 @RequestParam(defaultValue = "10") Integer pageSize,
+                                 @RequestParam(required = false) String name,
+                                 @RequestParam(required = false) SwipeStatus status) {
+        return swipeService.getSwipes(currentPage, pageSize, name, status);
     }
 
     @PostMapping("/")
@@ -41,7 +45,7 @@ public class SwipeController {
         if (Objects.isNull(request.imageId())) {
             throw new BaseBizException(HttpStatus.BAD_REQUEST, "图片ID不能为空！");
         }
-        return swipeService.addSwipe(request.name(), request.sequence(), request.imageId());
+        return swipeService.addSwipe(request.name(), request.status(), request.imageId());
     }
 
     @PatchMapping("/")

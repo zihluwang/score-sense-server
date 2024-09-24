@@ -97,4 +97,41 @@ public class VacancyService {
         CompletableFuture.allOf(saveVacancyTask, saveExamVacanciesTask).join();
         return vacancy;
     }
+
+    public Vacancy updateVacancy(Vacancy vacancy, List<Long> examIds) {
+        var examCount = examService.countExamsByExamIds(examIds);
+        if (examCount != examIds.size()) {
+            throw new BaseBizException(HttpStatus.BAD_REQUEST, "考试 ID 不存在");
+        }
+
+        var canUpdate = vacancyRepository.selectOneByEntityId(vacancy) != null;
+        if (!canUpdate) {
+            throw new BaseBizException(HttpStatus.BAD_REQUEST, "岗位不存在");
+        }
+
+        var examVacancies = examIds.stream()
+                .map((examId) -> ExamVacancy.builder()
+                        .examId(examId)
+                        .vacancyId(vacancy.getId())
+                        .build())
+                .toList();
+
+        var updateVacancyTask = CompletableFuture.runAsync(() -> vacancyRepository.update(vacancy, true), ConcurrentConfig.CACHED_EXECUTORS);
+        var updateExamVacancyTask = CompletableFuture.runAsync(() -> {
+            examVacancyRepository.deleteByCondition(ExamVacancy.EXAM_VACANCY.VACANCY_ID.eq(vacancy.getId()));
+            examVacancyRepository.insertBatch(examVacancies);
+        }, ConcurrentConfig.CACHED_EXECUTORS);
+        CompletableFuture.allOf(updateVacancyTask, updateExamVacancyTask).join();
+        return vacancy;
+    }
+
+    public void deleteVacancyById(Long vacancyId) {
+        var deleteVacancyTask = CompletableFuture.runAsync(
+                () -> vacancyRepository.deleteByCondition(Vacancy.VACANCY.ID.eq(vacancyId)),
+                ConcurrentConfig.CACHED_EXECUTORS);
+        var deleteExamVacancyTask = CompletableFuture.runAsync(
+                () -> examVacancyRepository.deleteByCondition(ExamVacancy.EXAM_VACANCY.VACANCY_ID.eq(vacancyId)),
+                ConcurrentConfig.CACHED_EXECUTORS);
+        CompletableFuture.allOf(deleteVacancyTask, deleteExamVacancyTask).join();
+    }
 }

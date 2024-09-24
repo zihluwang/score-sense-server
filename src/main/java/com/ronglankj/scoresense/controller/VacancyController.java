@@ -3,8 +3,13 @@ package com.ronglankj.scoresense.controller;
 import com.mybatisflex.core.paginate.Page;
 import com.ronglankj.scoresense.entity.Vacancy;
 import com.ronglankj.scoresense.model.request.CreateVacancyRequest;
+import com.ronglankj.scoresense.model.request.UpdateVacancyRequest;
+import com.ronglankj.scoresense.model.response.ActionResponse;
 import com.ronglankj.scoresense.service.VacancyService;
+import com.ronglankj.scoresense.util.DateTimeUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/vacancies")
@@ -52,5 +57,25 @@ public class VacancyController {
                 .name(request.name())
                 .province(request.province())
                 .prefecture(request.prefecture()), request.examIds());
+    }
+
+    @PatchMapping("/")
+    public Vacancy updateVacancy(@RequestBody UpdateVacancyRequest request) {
+        var vacancy = Vacancy.builder()
+                .id(request.id())
+                .name(request.name())
+                .province(request.province())
+                .prefecture(request.prefecture())
+                .build();
+        return vacancyService.updateVacancy(vacancy, request.examIds());
+    }
+
+    @DeleteMapping("/{vacancyId}")
+    public ActionResponse deleteVacancy(@PathVariable Long vacancyId) {
+        vacancyService.deleteVacancyById(vacancyId);
+        return ActionResponse.builder()
+                .timestamp(DateTimeUtils.toInstant(LocalDateTime.now()))
+                .message("岗位删除成功")
+                .build();
     }
 }

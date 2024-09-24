@@ -2,22 +2,36 @@ package com.ronglankj.scoresense.service;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.onixbyte.guid.GuidCreator;
+import com.ronglankj.scoresense.config.ConcurrentConfig;
 import com.ronglankj.scoresense.entity.ExamVacancy;
 import com.ronglankj.scoresense.entity.Vacancy;
+import com.ronglankj.scoresense.exception.BaseBizException;
+import com.ronglankj.scoresense.repository.ExamVacancyRepository;
 import com.ronglankj.scoresense.repository.VacancyRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
 public class VacancyService {
 
     private final VacancyRepository vacancyRepository;
+    private final GuidCreator<Long> vacancyIdCreator;
+    private final ExamService examService;
+    private final ExamVacancyRepository examVacancyRepository;
 
-    public VacancyService(VacancyRepository vacancyRepository) {
+    public VacancyService(VacancyRepository vacancyRepository,
+                          GuidCreator<Long> vacancyIdCreator, ExamService examService, ExamVacancyRepository examVacancyRepository) {
         this.vacancyRepository = vacancyRepository;
+        this.vacancyIdCreator = vacancyIdCreator;
+        this.examService = examService;
+        this.examVacancyRepository = examVacancyRepository;
     }
 
     /**
@@ -63,4 +77,24 @@ public class VacancyService {
         return vacancyRepository.selectOneByCondition(Vacancy.VACANCY.ID.eq(id));
     }
 
+    public Vacancy createVacancy(Vacancy.VacancyBuilder builder, List<Long> examIds) {
+        var vacancyId = vacancyIdCreator.nextId();
+        var examCount = examService.countExamsByExamIds(examIds);
+        if (examCount != examIds.size()) {
+            throw new BaseBizException(HttpStatus.BAD_REQUEST, "考试 ID 不存在");
+        }
+        var vacancy = builder.id(vacancyId).build();
+        var examVacancies = examIds.stream()
+                .map((examId) -> ExamVacancy.builder()
+                        .examId(examId)
+                        .vacancyId(vacancyId)
+                        .build())
+                .toList();
+        var saveVacancyTask = CompletableFuture.runAsync(
+                () -> vacancyRepository.insert(vacancy), ConcurrentConfig.CACHED_EXECUTORS);
+        var saveExamVacanciesTask = CompletableFuture.runAsync(
+                () -> examVacancyRepository.insertBatch(examVacancies), ConcurrentConfig.CACHED_EXECUTORS);
+        CompletableFuture.allOf(saveVacancyTask, saveExamVacanciesTask).join();
+        return vacancy;
+    }
 }

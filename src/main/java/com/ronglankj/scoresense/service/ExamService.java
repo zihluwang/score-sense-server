@@ -161,4 +161,14 @@ public class ExamService {
     public long countExamsByType(Integer typeId) {
         return examRepository.selectCountByCondition(Exam.EXAM.TYPE.eq(typeId));
     }
+
+    /**
+     * 根据考试 ID 统计考试数量。
+     *
+     * @param examIds 考试 ID 列表
+     * @return 考试的数量
+     */
+    public long countExamsByExamIds(List<Long> examIds) {
+        return examRepository.selectCountByCondition(Exam.EXAM.ID.in(examIds));
+    }
 }

@@ -49,7 +49,4 @@ jobs:
           password: ${{ secrets.GH_TOKEN }}
 
       - name: Build Docker Image
-        run: |
-          docker buildx build --platform linux/amd64,linux/arm64 \ 
-          --build-arg APP_VERSION=${{ github.event.release.tag_name }} \
-          --tag ghcr.io/onixbyte-business/score-sense/score-sense-db:${{ github.event.release.tag_name }} --push .
+        run: docker buildx build --platform linux/amd64,linux/arm64 --build-arg APP_VERSION=${{ github.event.release.tag_name }} --tag ghcr.io/onixbyte-business/score-sense/score-sense-db:${{ github.event.release.tag_name }} --push .

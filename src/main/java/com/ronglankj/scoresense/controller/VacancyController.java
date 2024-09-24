@@ -51,6 +51,12 @@ public class VacancyController {
         return vacancyService.getVacancy(vacancyId);
     }
 
+    /**
+     * 创建岗位。
+     *
+     * @param request 创建岗位请求
+     * @return 被创建的岗位信息
+     */
     @PostMapping("/")
     public Vacancy createVacancy(@RequestBody CreateVacancyRequest request) {
         return vacancyService.createVacancy(Vacancy.builder()
@@ -59,6 +65,12 @@ public class VacancyController {
                 .prefecture(request.prefecture()), request.examIds());
     }
 
+    /**
+     * 更新岗位信息。
+     *
+     * @param request 更新岗位请求
+     * @return 被更新的岗位信息
+     */
     @PatchMapping("/")
     public Vacancy updateVacancy(@RequestBody UpdateVacancyRequest request) {
         var vacancy = Vacancy.builder()

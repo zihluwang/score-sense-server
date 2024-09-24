@@ -1,10 +1,12 @@
 FROM amazoncorretto:21
 LABEL authors="zihluwang"
 
+ARG APP_VERSION=""
+
 ENV TZ="Asia/Shanghai"
 ENV ACTIVE_PROFILES=""
 
 WORKDIR /app
-ADD build/libs/score-sense-server-canary-240924.jar app.jar
+ADD build/libs/score-sense-server-$APP_VERSION.jar app.jar
 
 ENTRYPOINT ["/bin/sh", "-c", "java -jar -Dspring.profiles.active=$ACTIVE_PROFILES app.jar"]

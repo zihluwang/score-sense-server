@@ -16,11 +16,9 @@ public class WechatCache {
         this.wechatAccessTokenRedisTemplate = wechatAccessTokenRedisTemplate;
     }
 
-    public void saveAccessToken(WechatAccessTokenResponse wechatAccessTokenResponse) {
+    public void saveAccessToken(String accessToken) {
         wechatAccessTokenRedisTemplate.opsForValue()
-                .set("score-sense:wechat:access-token",
-                        wechatAccessTokenResponse.accessToken(),
-                        Duration.ofSeconds(wechatAccessTokenResponse.expiresIn()));
+                .set("score-sense:wechat:access-token", accessToken, Duration.ofSeconds(7200));
     }
 
     public String getAccessToken() {

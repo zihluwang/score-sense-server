@@ -9,8 +9,8 @@ import java.util.Optional;
 @Getter
 public enum SwipeStatus {
 
-    ENABLED(0),
-    DISABLED(1);
+    ENABLED(1),
+    DISABLED(0);
 
     @EnumValue
     private final Integer code;

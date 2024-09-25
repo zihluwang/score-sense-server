@@ -6,6 +6,7 @@ import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
 import com.ronglankj.scoresense.enumeration.SwipeStatus;
+import com.ronglankj.scoresense.view.SwipeView;
 import lombok.*;
 
 /**
@@ -68,6 +69,15 @@ public class Swipe {
             var key = getNameWithSchema() + "." + alias;
             return getCache(key, (k) -> new SwipeTableDef("", "swipe", alias));
         }
+    }
+
+    public SwipeView toView() {
+        return SwipeView.builder()
+                .id(String.valueOf(id))
+                .name(name)
+                .status(status.getCode())
+                .imageId(String.valueOf(imageId))
+                .build();
     }
 
 }

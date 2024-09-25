@@ -10,6 +10,7 @@ import com.ronglankj.scoresense.model.request.UpdateSwipeRequest;
 import com.ronglankj.scoresense.model.response.ActionResponse;
 import com.ronglankj.scoresense.service.SwipeService;
 import com.ronglankj.scoresense.util.DateTimeUtils;
+import com.ronglankj.scoresense.view.SwipeView;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,29 +29,32 @@ public class SwipeController {
     }
 
     @GetMapping("/enabled")
-    public List<Swipe> getAvailableSwipes() {
-        return swipeService.getAvailableSwipes();
+    public List<SwipeView> getAvailableSwipes() {
+        return swipeService.getAvailableSwipes().stream()
+                .map(Swipe::toView)
+                .toList();
     }
 
     @GetMapping("/")
-    public Page<Swipe> getSwipes(@RequestParam(defaultValue = "1") Integer currentPage,
-                                 @RequestParam(defaultValue = "10") Integer pageSize,
-                                 @RequestParam(required = false) String name,
-                                 @RequestParam(required = false) SwipeStatus status) {
-        return swipeService.getSwipes(currentPage, pageSize, name, status);
+    public Page<SwipeView> getSwipes(@RequestParam(defaultValue = "1") Integer currentPage,
+                                     @RequestParam(defaultValue = "10") Integer pageSize,
+                                     @RequestParam(required = false) String name,
+                                     @RequestParam(required = false) SwipeStatus status) {
+        return swipeService.getSwipes(currentPage, pageSize, name, status)
+                .map(Swipe::toView);
     }
 
     @PostMapping("/")
-    public Swipe createSwipe(@RequestBody CreateSwipeRequest request) {
+    public SwipeView createSwipe(@RequestBody CreateSwipeRequest request) {
         if (Objects.isNull(request.imageId())) {
             throw new BaseBizException(HttpStatus.BAD_REQUEST, "图片ID不能为空！");
         }
-        return swipeService.addSwipe(request.name(), request.status(), request.imageId());
+        return swipeService.addSwipe(request.name(), request.status(), request.imageId()).toView();
     }
 
     @PatchMapping("/")
-    public Swipe updateSwipe(@RequestBody UpdateSwipeRequest request) {
-        return swipeService.updateSwipe(request);
+    public SwipeView updateSwipe(@RequestBody UpdateSwipeRequest request) {
+        return swipeService.updateSwipe(request).toView();
     }
 
     @DeleteMapping("/{swipeId}")

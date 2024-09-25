@@ -18,7 +18,7 @@ class ScoreSenseApplicationTests {
 
     @Test
     void contextLoads() {
-        var wechatToken = wechatService.loadAccessToken();
+        var wechatToken = wechatService.getAccessToken();
         System.out.println(wechatToken);
     }
 

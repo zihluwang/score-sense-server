@@ -24,59 +24,10 @@ import java.util.Map;
 @Service
 public class UserService {
 
-    private final WechatProperty weChatProperty;
-    private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
-    private final WebClient wechatClient;
 
-    public UserService(WechatProperty weChatProperty,
-                       ObjectMapper jacksonObjectMapper,
-                       UserRepository userRepository,
-                       WebClient wechatClient) {
-        this.weChatProperty = weChatProperty;
-        this.objectMapper = jacksonObjectMapper;
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.wechatClient = wechatClient;
-    }
-
-    /**
-     * 请求微信 API 获取微信用户 ID。
-     *
-     * @param code 微信用户一次性登录代码
-     * @return 用户信息
-     */
-    public WechatUserInfo getWeChatUserInfo(String code) {
-        try {
-            // 发送获取用户身份信息的请求
-            var result = wechatClient.get()
-                    .uri((uriBuilder) -> uriBuilder
-                            .path("/sns/jscode2session")
-                            .queryParam("appid", weChatProperty.getAppId())
-                            .queryParam("secret", weChatProperty.getAppSecret())
-                            .queryParam("js_code", code)
-                            .queryParam("grant_type", "authorization_code")
-                            .build())
-                    .retrieve()
-                    .bodyToMono(String.class) // 微信的响应中，Content-Type 被设置为 text/plain
-                    .block();
-
-            // 由于微信接口中命名不符合 Java 中的参数命名规范，因此将数据转储为 Map<String, String>
-            var resultMap = objectMapper.readValue(result, new TypeReference<Map<String, String>>() {
-            });
-
-            // errorCode == -1: 系统繁忙，稍后再试
-            // errorCode == 0: 请求成功
-            // errorCode == 40029: code 无效
-            // errorCode == 45011: 频率限制，每个用户1分钟限量100次
-            // errorCode == 40226: 高风险等级用户，小程序登录拦截
-
-            return WechatUserInfo.builder()
-                    .openId(resultMap.get("openid"))
-                    .sessionKey(resultMap.get("session_key"))
-                    .build();
-        } catch (JsonProcessingException e) {
-            throw new BaseBizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法解析用户信息");
-        }
     }
 
     /**

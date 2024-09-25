@@ -1,5 +1,8 @@
 package com.ronglankj.scoresense.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ronglankj.scoresense.cache.WechatCache;
 import com.ronglankj.scoresense.exception.BaseBizException;
 import com.ronglankj.scoresense.model.biz.WechatAccessTokenResponse;
@@ -12,10 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -25,15 +25,23 @@ public class WechatService {
     private final WebClient wechatClient;
     private final WechatProperty wechatProperty;
     private final WechatCache wechatCache;
+    private final ObjectMapper objectMapper;
 
     public WechatService(WebClient wechatClient,
-                         WechatProperty wechatProperty, WechatCache wechatCache) {
+                         WechatProperty wechatProperty,
+                         WechatCache wechatCache,
+                         ObjectMapper objectMapper) {
         this.wechatClient = wechatClient;
         this.wechatProperty = wechatProperty;
         this.wechatCache = wechatCache;
+        this.objectMapper = objectMapper;
     }
 
-    protected WechatAccessTokenResponse fetchAccessToken() {
+    /**
+     * 获取微信 AccessToken。
+     * @return 微信 AccessToken
+     */
+    protected String fetchAccessToken() {
         var response = wechatClient.get()
                 .uri((uriBuilder) -> uriBuilder.path("/cgi-bin/token")
                         .queryParam("grant_type", "client_credential")
@@ -53,23 +61,17 @@ public class WechatService {
 
         var responseAccessToken = response.get("access_token");
         if (responseAccessToken instanceof String plainAccessToken) {
-            accessTokenBuilder.accessToken(plainAccessToken);
+            return plainAccessToken;
         }
-
-        var responseExpiresIn = response.get("expires_in");
-        if (responseExpiresIn instanceof Integer plainExpiresIn) {
-            accessTokenBuilder.expiresIn(plainExpiresIn);
-        }
-
-        return accessTokenBuilder.build();
+        throw new BaseBizException(HttpStatus.SERVICE_UNAVAILABLE, "微信服务繁忙，请稍后再试");
     }
 
-    public String loadAccessToken() {
+    public String getAccessToken() {
         var accessToken = wechatCache.getAccessToken();
         if (Objects.isNull(accessToken) || accessToken.isBlank()) {
             var response = fetchAccessToken();
-            wechatCache.saveAccessToken(response.accessToken());
-            accessToken = response.accessToken();
+            wechatCache.saveAccessToken(response);
+            accessToken = response;
         }
         return accessToken;
     }
@@ -90,7 +92,7 @@ public class WechatService {
 
         return wechatClient.post()
                 .uri((uriBuilder) -> uriBuilder.path("/wxa/getwxacodeunlimit")
-                        .queryParam("access_token", loadAccessToken())
+                        .queryParam("access_token", getAccessToken())
                         .build())
                 .bodyValue(requestBody)
                 .exchangeToMono((_response) -> {
@@ -102,6 +104,43 @@ public class WechatService {
                             });
                 })
                 .block();
+    }
+
+    /**
+     * 请求微信 API 获取微信用户 ID。
+     *
+     * @param code 微信用户一次性登录代码
+     * @return 用户信息
+     */
+    public String getWechatUserOpenId(String code) {
+        try {
+            // 发送获取用户身份信息的请求
+            var result = wechatClient.get()
+                    .uri((uriBuilder) -> uriBuilder
+                            .path("/sns/jscode2session")
+                            .queryParam("appid", wechatProperty.getAppId())
+                            .queryParam("secret", wechatProperty.getAppSecret())
+                            .queryParam("js_code", code)
+                            .queryParam("grant_type", "authorization_code")
+                            .build())
+                    .retrieve()
+                    .bodyToMono(String.class) // 微信的响应中，Content-Type 被设置为 text/plain
+                    .block();
+
+            // 由于微信接口中命名不符合 Java 中的参数命名规范，因此将数据转储为 Map<String, String>
+            var resultMap = objectMapper.readValue(result, new TypeReference<Map<String, String>>() {
+            });
+
+            // errorCode == -1: 系统繁忙，稍后再试
+            // errorCode == 0: 请求成功
+            // errorCode == 40029: code 无效
+            // errorCode == 45011: 频率限制，每个用户1分钟限量100次
+            // errorCode == 40226: 高风险等级用户，小程序登录拦截
+
+            return resultMap.get("openid");
+        } catch (JsonProcessingException e) {
+            throw new BaseBizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法解析用户信息");
+        }
     }
 
 }

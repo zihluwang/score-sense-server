@@ -4,6 +4,7 @@ import com.ronglankj.scoresense.entity.Attachment;
 import com.ronglankj.scoresense.exception.BaseBizException;
 import com.ronglankj.scoresense.model.request.UploadAttachmentRequest;
 import com.ronglankj.scoresense.service.AttachmentService;
+import com.ronglankj.scoresense.view.AttachmentView;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
@@ -28,8 +29,8 @@ public class AttachmentController {
     }
 
     @PostMapping("/")
-    public Attachment uploadAttachment(@ModelAttribute UploadAttachmentRequest request) {
-        return attachmentService.saveAttachment(request);
+    public AttachmentView uploadAttachment(@ModelAttribute UploadAttachmentRequest request) {
+        return attachmentService.saveAttachment(request).toView();
     }
 
     @GetMapping("/{attachmentId}")

@@ -5,6 +5,7 @@ import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
+import com.ronglankj.scoresense.view.AttachmentView;
 import lombok.*;
 
 @Table("attachment")
@@ -52,6 +53,15 @@ public class Attachment {
             var key = getNameWithSchema() + "." + alias;
             return getCache(key, (k) -> new AttachmentTableDef("", "attachment", alias));
         }
+    }
+
+    public AttachmentView toView() {
+        return AttachmentView.builder()
+                .id(String.valueOf(id))
+                .name(name)
+                .contentType(contentType)
+                .path(path)
+                .build();
     }
 
 }

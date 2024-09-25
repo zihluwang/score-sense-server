@@ -10,7 +10,7 @@ import lombok.Builder;
  * @author zihluwang
  */
 @Builder
-public record WeChatUserInfo(
+public record WechatUserInfo(
         String sessionKey,
         String openId
 ) {

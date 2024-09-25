@@ -5,7 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Data
 @ConfigurationProperties(prefix = "application.wechat")
-public class WeChatProperty {
+public class WechatProperty {
 
     /**
      * 小程序 ID

@@ -12,6 +12,7 @@ import com.ronglankj.scoresense.repository.VacancyRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -77,7 +78,11 @@ public class VacancyService {
         return vacancyRepository.selectOneByCondition(Vacancy.VACANCY.ID.eq(id));
     }
 
+    @Transactional
     public Vacancy createVacancy(Vacancy.VacancyBuilder builder, List<Long> examIds) {
+        if (examIds.isEmpty()) {
+            throw new BaseBizException(HttpStatus.BAD_REQUEST, "岗位未绑定考试");
+        }
         var vacancyId = vacancyIdCreator.nextId();
         var examCount = examService.countExamsByExamIds(examIds);
         if (examCount != examIds.size()) {
@@ -91,9 +96,11 @@ public class VacancyService {
                         .build())
                 .toList();
         var saveVacancyTask = CompletableFuture.runAsync(
-                () -> vacancyRepository.insert(vacancy), ConcurrentConfig.CACHED_EXECUTORS);
+                () -> vacancyRepository.insert(vacancy),
+                ConcurrentConfig.CACHED_EXECUTORS);
         var saveExamVacanciesTask = CompletableFuture.runAsync(
-                () -> examVacancyRepository.insertBatch(examVacancies), ConcurrentConfig.CACHED_EXECUTORS);
+                () -> examVacancyRepository.insertBatch(examVacancies),
+                ConcurrentConfig.CACHED_EXECUTORS);
         CompletableFuture.allOf(saveVacancyTask, saveExamVacanciesTask).join();
         return vacancy;
     }

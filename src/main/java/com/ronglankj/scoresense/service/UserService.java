@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ronglankj.scoresense.entity.User;
 import com.ronglankj.scoresense.exception.BaseBizException;
-import com.ronglankj.scoresense.model.biz.WeChatUserInfo;
-import com.ronglankj.scoresense.property.WeChatProperty;
+import com.ronglankj.scoresense.model.biz.WechatUserInfo;
+import com.ronglankj.scoresense.property.WechatProperty;
 import com.ronglankj.scoresense.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -24,19 +24,19 @@ import java.util.Map;
 @Service
 public class UserService {
 
-    private final WeChatProperty weChatProperty;
-    private final WebClient weChatClient;
+    private final WechatProperty weChatProperty;
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
+    private final WebClient wechatClient;
 
-    public UserService(WeChatProperty weChatProperty,
-                       WebClient weChatClient,
+    public UserService(WechatProperty weChatProperty,
                        ObjectMapper jacksonObjectMapper,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       WebClient wechatClient) {
         this.weChatProperty = weChatProperty;
-        this.weChatClient = weChatClient;
         this.objectMapper = jacksonObjectMapper;
         this.userRepository = userRepository;
+        this.wechatClient = wechatClient;
     }
 
     /**
@@ -45,10 +45,10 @@ public class UserService {
      * @param code 微信用户一次性登录代码
      * @return 用户信息
      */
-    public WeChatUserInfo getWeChatUserInfo(String code) {
+    public WechatUserInfo getWeChatUserInfo(String code) {
         try {
             // 发送获取用户身份信息的请求
-            var result = weChatClient.get()
+            var result = wechatClient.get()
                     .uri((uriBuilder) -> uriBuilder
                             .path("/sns/jscode2session")
                             .queryParam("appid", weChatProperty.getAppId())
@@ -70,7 +70,7 @@ public class UserService {
             // errorCode == 45011: 频率限制，每个用户1分钟限量100次
             // errorCode == 40226: 高风险等级用户，小程序登录拦截
 
-            return WeChatUserInfo.builder()
+            return WechatUserInfo.builder()
                     .openId(resultMap.get("openid"))
                     .sessionKey(resultMap.get("session_key"))
                     .build();

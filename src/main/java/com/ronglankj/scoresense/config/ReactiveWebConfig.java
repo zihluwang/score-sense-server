@@ -8,7 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class ReactiveWebConfig {
 
     @Bean
-    public WebClient weChatClient(WebClient.Builder builder) {
+    public WebClient wechatClient(WebClient.Builder builder) {
         return builder.baseUrl("https://api.weixin.qq.com")
                 .build();
     }

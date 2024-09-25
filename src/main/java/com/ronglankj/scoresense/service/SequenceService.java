@@ -25,13 +25,14 @@ public class SequenceService {
         if (Objects.isNull(sequence)) {
             sequence = Sequence.builder()
                     .key(key)
-                    .next(0L)
+                    .next(1L)
                     .build();
+            sequenceRepository.insert(sequence);
         }
 
         var next = sequence.getNext();
         sequence.setNext(next + 1);
-        sequenceRepository.updateByCondition(sequence, condition);
+        sequenceRepository.update(sequence);
         return next;
     }
 

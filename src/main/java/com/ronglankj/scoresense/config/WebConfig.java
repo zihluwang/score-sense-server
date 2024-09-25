@@ -63,26 +63,16 @@ public class WebConfig implements WebMvcConfigurer {
                 .excludePathPatterns("/admins/login");
     }
 
-    @Bean
-    public FilterRegistrationBean<CorsFilter> corsFilter() {
-        var source = new UrlBasedCorsConfigurationSource();
-
-        var config = new CorsConfiguration();
-        Optional.ofNullable(corsProperty.getAllowCredentials())
-                .ifPresent(config::setAllowCredentials);
-        config.addAllowedOriginPattern(String.join(",",
-                Arrays.stream(corsProperty.getAllowedOrigins()).toList()));
-        config.addAllowedHeader(String.join(",",
-                Arrays.stream(corsProperty.getAllowedHeaders()).toList()));
-        config.addAllowedMethod(String.join(",",
-                Arrays.stream(corsProperty.getAllowedMethods()).map(RequestMethod::name).toList()));
-        config.addExposedHeader(String.join(",",
-                Arrays.stream(corsProperty.getExposedHeaders()).toList()));
-
-        source.registerCorsConfiguration("/**", config);
-        var bean = new FilterRegistrationBean<>(new CorsFilter(source));
-        bean.setOrder(0);
-        return bean;
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins(corsProperty.getAllowedOrigins())
+                .allowCredentials(corsProperty.getAllowCredentials())
+                .allowedMethods(Arrays.stream(corsProperty.getAllowedMethods())
+                        .map(RequestMethod::name)
+                        .toArray(String[]::new))
+                .allowedHeaders(corsProperty.getAllowedHeaders())
+                .exposedHeaders(corsProperty.getExposedHeaders());
     }
 
     @Autowired

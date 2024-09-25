@@ -16,9 +16,9 @@ public class CorsProperty {
             RequestMethod.DELETE,
     };
 
-    private Boolean allowCredentials = true;
+    private Boolean allowCredentials = false;
 
-    private String[] allowedOrigins = {"https://exam1.ronglankj.com"};
+    private String[] allowedOrigins = {"*"};
 
     private String[] allowedHeaders = {"Content-Type", "Authorization"};
 

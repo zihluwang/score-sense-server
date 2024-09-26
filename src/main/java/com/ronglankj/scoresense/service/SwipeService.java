@@ -50,7 +50,9 @@ public class SwipeService {
         // 构建实体数据
         var swipe = Swipe.builder()
                 .id(swipeId)
-                .name(Optional.ofNullable(name).filter(String::isBlank).orElse("图片-%d".formatted(swipeId)))
+                .name(Optional.ofNullable(name)
+                        .filter((_name) -> !_name.isBlank())
+                        .orElse("图片-%d".formatted(swipeId)))
                 .status(status)
                 .imageId(imageId)
                 .build();

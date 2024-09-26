@@ -1,3 +1,5 @@
+.DS_Store
+
 HELP.md
 .gradle
 build/
@@ -36,4 +38,5 @@ out/
 ### VS Code ###
 .vscode/
 
-config/*local*.yml
+/config/
+/uploads/

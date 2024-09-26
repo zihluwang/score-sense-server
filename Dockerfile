@@ -1,5 +1,6 @@
 FROM amazoncorretto:21
 LABEL authors="zihluwang"
+LABEL org.opencontainers.image.source="https://github.com/OnixByte-Business/score-sense"
 
 ARG APP_VERSION=""
 

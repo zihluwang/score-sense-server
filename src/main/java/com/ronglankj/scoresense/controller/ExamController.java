@@ -10,6 +10,7 @@ import com.ronglankj.scoresense.model.request.UpdateExamTypeRequest;
 import com.ronglankj.scoresense.model.response.ActionResponse;
 import com.ronglankj.scoresense.service.ExamService;
 import com.ronglankj.scoresense.util.DateTimeUtils;
+import com.ronglankj.scoresense.view.ExamView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -35,9 +36,9 @@ public class ExamController {
      * @return 考试列表分页数据
      */
     @GetMapping("/")
-    public Page<Exam> getExams(@RequestParam(required = false, defaultValue = "1") Integer currentPage,
-                               @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
-        return examService.getExamPage(currentPage, pageSize);
+    public Page<ExamView> getExams(@RequestParam(required = false, defaultValue = "1") Integer currentPage,
+                                   @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        return examService.getExamPage(currentPage, pageSize).map(Exam::toView);
     }
 
     /**
@@ -47,7 +48,8 @@ public class ExamController {
      * @return 创建的考试信息
      */
     @PostMapping("/")
-    public Exam createExam(@ModelAttribute CreateExamRequest request) {
+    public ExamView createExam(@ModelAttribute CreateExamRequest request) {
+        // todo 实现该功能
         throw new BaseBizException(HttpStatus.SERVICE_UNAVAILABLE, "接口暂未开放");
     }
 
@@ -62,11 +64,11 @@ public class ExamController {
      * @return 考试信息分页数据
      */
     @GetMapping("/types/{examTypeId}")
-    public Page<Exam> getExamByType(@RequestParam(defaultValue = "1") Integer currentPage,
+    public Page<ExamView> getExamByType(@RequestParam(defaultValue = "1") Integer currentPage,
                                     @RequestParam(defaultValue = "10") Integer pageSize,
                                     @PathVariable Integer examTypeId,
                                     @RequestParam(required = false) String divisionCode) {
-        return examService.getExamsByExamType(examTypeId, divisionCode, currentPage, pageSize);
+        return examService.getExamsByExamType(examTypeId, divisionCode, currentPage, pageSize).map(Exam::toView);
     }
 
     /**

@@ -5,6 +5,7 @@ import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
+import com.ronglankj.scoresense.view.ExamView;
 import lombok.*;
 
 /**
@@ -53,6 +54,17 @@ public class Exam {
     private String prefecture;
 
     public static final ExamTableDef EXAM = new ExamTableDef();
+
+    public ExamView toView() {
+        return ExamView.builder()
+                .id(String.valueOf(id))
+                .name(name)
+                .type(type)
+                .description(description)
+                .province(province)
+                .prefecture(prefecture)
+                .build();
+    }
 
     public static class ExamTableDef extends TableDef {
 

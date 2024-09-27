@@ -3,18 +3,25 @@ package com.ronglankj.scoresense.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.onixbyte.guid.GuidCreator;
 import com.ronglankj.scoresense.cache.WechatCache;
 import com.ronglankj.scoresense.exception.BaseBizException;
+import com.ronglankj.scoresense.extension.spring.ByteArrayMultipartFile;
 import com.ronglankj.scoresense.model.biz.WechatAccessTokenResponse;
 import com.ronglankj.scoresense.model.request.ShareQrcodeRequest;
+import com.ronglankj.scoresense.model.request.UploadAttachmentRequest;
 import com.ronglankj.scoresense.property.WechatProperty;
+import com.ronglankj.scoresense.view.AttachmentView;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.*;
 
 @Slf4j
@@ -26,19 +33,26 @@ public class WechatService {
     private final WechatProperty wechatProperty;
     private final WechatCache wechatCache;
     private final ObjectMapper objectMapper;
+    private final AttachmentService attachmentService;
+    private final GuidCreator<Long> attachmentIdCreator;
 
     public WechatService(WebClient wechatClient,
                          WechatProperty wechatProperty,
                          WechatCache wechatCache,
-                         ObjectMapper objectMapper) {
+                         ObjectMapper objectMapper,
+                         AttachmentService attachmentService,
+                         GuidCreator<Long> attachmentIdCreator) {
         this.wechatClient = wechatClient;
         this.wechatProperty = wechatProperty;
         this.wechatCache = wechatCache;
         this.objectMapper = objectMapper;
+        this.attachmentService = attachmentService;
+        this.attachmentIdCreator = attachmentIdCreator;
     }
 
     /**
      * 获取微信 AccessToken。
+     *
      * @return 微信 AccessToken
      */
     protected String fetchAccessToken() {
@@ -76,7 +90,7 @@ public class WechatService {
         return accessToken;
     }
 
-    public String fetchShareQrcode(ShareQrcodeRequest request) {
+    public AttachmentView fetchShareQrcode(ShareQrcodeRequest request) {
         var requestBody = new HashMap<String, Object>();
 
         // 微信要求 scene 必填
@@ -90,20 +104,30 @@ public class WechatService {
         Optional.ofNullable(request.width())
                 .ifPresent((width) -> requestBody.put("width", width));
 
-        return wechatClient.post()
+        var image = wechatClient.post()
                 .uri((uriBuilder) -> uriBuilder.path("/wxa/getwxacodeunlimit")
                         .queryParam("access_token", getAccessToken())
                         .build())
                 .bodyValue(requestBody)
-                .exchangeToMono((_response) -> {
-                    var _contentType = _response.headers().contentType().orElse(MediaType.APPLICATION_OCTET_STREAM);
-                    return _response.bodyToMono(byte[].class)
-                            .map((bytes) -> {
-                                var base64String = Base64.getEncoder().encodeToString(bytes);
-                                return "data:%s;base64, %s".formatted(_contentType.toString(), base64String);
-                            });
+                .exchangeToMono((response) -> {
+                    var contentType = response.headers().contentType().orElse(MediaType.APPLICATION_OCTET_STREAM);
+                    var attachmentId = attachmentIdCreator.nextId();
+                    return response.bodyToMono(byte[].class)
+                            .map((content) -> new ByteArrayMultipartFile("小程序码-%d".formatted(attachmentId),
+                                    contentType.toString(), content));
                 })
                 .block();
+
+        if (Objects.isNull(image)) {
+            throw new BaseBizException(HttpStatus.BAD_GATEWAY, "微信服务暂不可用，请稍后重试");
+        }
+
+        var attachment = attachmentService.saveAttachment(UploadAttachmentRequest.builder()
+                .file(image)
+                .name(image.getName())
+                .build());
+
+        return attachment.toView();
     }
 
     /**

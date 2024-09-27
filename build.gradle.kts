@@ -9,7 +9,7 @@ plugins {
  */
 val artefactVersion: String by project
 
-group = "com.ronglankj"
+group = "com.ahgtgk"
 version = artefactVersion
 
 java {

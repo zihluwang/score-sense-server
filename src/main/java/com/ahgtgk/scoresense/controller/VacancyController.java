@@ -59,10 +59,7 @@ public class VacancyController {
      */
     @PostMapping("/")
     public Vacancy createVacancy(@RequestBody CreateVacancyRequest request) {
-        return vacancyService.createVacancy(Vacancy.builder()
-                .name(request.name())
-                .province(request.province())
-                .prefecture(request.prefecture()), request.examIds());
+        return vacancyService.createVacancy(request);
     }
 
     /**

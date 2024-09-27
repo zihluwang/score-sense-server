@@ -40,4 +40,9 @@ public class GuidConfig {
         return new SnowflakeGuidCreator(0x1, 0x2, projectStartDateTime.toEpochSecond());
     }
 
+    @Bean
+    public GuidCreator<Long> examIdCreator() {
+        return new SnowflakeGuidCreator(0x1, 0x3, projectStartDateTime.toEpochSecond());
+    }
+
 }

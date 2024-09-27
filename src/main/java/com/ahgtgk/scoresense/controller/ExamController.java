@@ -1,22 +1,21 @@
 package com.ahgtgk.scoresense.controller;
 
-import com.ahgtgk.scoresense.model.request.ExamQueryRequest;
+import com.ahgtgk.scoresense.model.request.*;
 import com.mybatisflex.core.paginate.Page;
 import com.ahgtgk.scoresense.entity.Exam;
 import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.exception.BaseBizException;
-import com.ahgtgk.scoresense.model.request.CreateExamRequest;
-import com.ahgtgk.scoresense.model.request.CreateExamTypeRequest;
-import com.ahgtgk.scoresense.model.request.UpdateExamTypeRequest;
 import com.ahgtgk.scoresense.model.response.ActionResponse;
 import com.ahgtgk.scoresense.service.ExamService;
 import com.ahgtgk.scoresense.util.DateTimeUtils;
 import com.ahgtgk.scoresense.view.ExamView;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/exams")
@@ -40,7 +39,8 @@ public class ExamController {
     public Page<ExamView> getExams(@RequestParam(required = false, defaultValue = "1") Integer currentPage,
                                    @RequestParam(required = false, defaultValue = "10") Integer pageSize,
                                    @ModelAttribute ExamQueryRequest request) {
-        return examService.getExamPage(currentPage, pageSize, request.divisionCode(), request.name()).map(Exam::toView);
+        return examService.getExamPage(currentPage, pageSize, request.divisionCode(), request.name())
+                .map(Exam::toView);
     }
 
     /**
@@ -50,11 +50,20 @@ public class ExamController {
      * @return 创建的考试信息
      */
     @PostMapping("/")
-    public ExamView createExam(@ModelAttribute CreateExamRequest request) {
-        // todo 实现该功能
-        throw new BaseBizException(HttpStatus.SERVICE_UNAVAILABLE, "接口暂未开放");
+    public ExamView createExam(@Valid @RequestBody CreateExamRequest request) {
+        return examService.createExam(request).toView();
     }
 
+    @PatchMapping("/")
+    public ExamView updateExam(@Valid @RequestBody UpdateExamRequest request) {
+        return examService.updateExam(request).toView();
+    }
+
+    @DeleteMapping("/{examId}")
+    public ActionResponse deleteExam(@PathVariable Long examId) {
+        examService.deleteExam(examId);
+        return new ActionResponse("删除考试成功");
+    }
 
     /**
      * 根据考试类型查询考试列表。
@@ -67,9 +76,9 @@ public class ExamController {
      */
     @GetMapping("/types/{examTypeId}")
     public Page<ExamView> getExamByType(@RequestParam(defaultValue = "1") Integer currentPage,
-                                    @RequestParam(defaultValue = "10") Integer pageSize,
-                                    @PathVariable Integer examTypeId,
-                                    @RequestParam(required = false) String divisionCode) {
+                                        @RequestParam(defaultValue = "10") Integer pageSize,
+                                        @PathVariable Integer examTypeId,
+                                        @RequestParam(required = false) String divisionCode) {
         return examService.getExamsByExamType(examTypeId, divisionCode, currentPage, pageSize).map(Exam::toView);
     }
 

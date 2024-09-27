@@ -1,5 +1,7 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
@@ -17,6 +19,7 @@ import lombok.*;
 @EqualsAndHashCode
 public class Vacancy {
 
+    @Id(keyType = KeyType.None)
     private Long id;
 
     private String name;

@@ -1,5 +1,7 @@
 package com.ahgtgk.scoresense.service;
 
+import com.ahgtgk.scoresense.model.request.CreateVacancyRequest;
+import com.ahgtgk.scoresense.repository.ExamRepository;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.onixbyte.guid.GuidCreator;
@@ -26,13 +28,15 @@ public class VacancyService {
     private final GuidCreator<Long> vacancyIdCreator;
     private final ExamService examService;
     private final ExamVacancyRepository examVacancyRepository;
+    private final ExamRepository examRepository;
 
     public VacancyService(VacancyRepository vacancyRepository,
-                          GuidCreator<Long> vacancyIdCreator, ExamService examService, ExamVacancyRepository examVacancyRepository) {
+                          GuidCreator<Long> vacancyIdCreator, ExamService examService, ExamVacancyRepository examVacancyRepository, ExamRepository examRepository) {
         this.vacancyRepository = vacancyRepository;
         this.vacancyIdCreator = vacancyIdCreator;
         this.examService = examService;
         this.examVacancyRepository = examVacancyRepository;
+        this.examRepository = examRepository;
     }
 
     /**
@@ -78,32 +82,63 @@ public class VacancyService {
         return vacancyRepository.selectOneByCondition(Vacancy.VACANCY.ID.eq(id));
     }
 
+    /**
+     * 创建岗位。
+     *
+     * @param request 创建岗位请求
+     * @return 被创建的岗位
+     */
     @Transactional
-    public Vacancy createVacancy(Vacancy.VacancyBuilder builder, List<Long> examIds) {
-        if (examIds.isEmpty()) {
-            throw new BaseBizException(HttpStatus.BAD_REQUEST, "岗位未绑定考试");
+    public Vacancy createVacancy(CreateVacancyRequest request) {
+        // 存储岗位信息
+        var vacancyId = Optional.ofNullable(request.id()).orElseGet(vacancyIdCreator::nextId);
+        var vacancy = Vacancy.builder()
+                .id(vacancyId)
+                .name(request.name())
+                .province(request.province())
+                .prefecture(request.prefecture())
+                .build();
+
+        // 检查是否可以创建岗位
+        var canCreate = examRepository.selectCountByCondition(Vacancy.VACANCY.ID.eq(vacancyId)
+                .or(Vacancy.VACANCY.NAME.eq(request.name()))) == 0;
+
+        if (!canCreate) {
+            throw new BaseBizException(HttpStatus.CONFLICT, "岗位名称/代码已存在");
         }
-        var vacancyId = vacancyIdCreator.nextId();
-        var examCount = examService.countExamsByExamIds(examIds);
-        if (examCount != examIds.size()) {
-            throw new BaseBizException(HttpStatus.BAD_REQUEST, "考试 ID 不存在");
-        }
-        var vacancy = builder.id(vacancyId).build();
-        var examVacancies = examIds.stream()
-                .map((examId) -> ExamVacancy.builder()
-                        .examId(examId)
-                        .vacancyId(vacancyId)
-                        .build())
-                .toList();
+
+        // 异步存储岗位信息
         var saveVacancyTask = CompletableFuture.runAsync(
-                () -> vacancyRepository.insert(vacancy),
-                ConcurrentConfig.CACHED_EXECUTORS);
-        var saveExamVacanciesTask = CompletableFuture.runAsync(
-                () -> examVacancyRepository.insertBatch(examVacancies),
-                ConcurrentConfig.CACHED_EXECUTORS);
-        CompletableFuture.allOf(saveVacancyTask, saveExamVacanciesTask).join();
+                () -> vacancyRepository.insert(vacancy), ConcurrentConfig.CACHED_EXECUTORS);
+
+        // 如果有考试信息则绑定考试信息
+        if (!request.examIds().isEmpty()) {
+            var examIds = request.examIds();
+            var examCount = examService.countExamsByExamIds(examIds);
+
+            if (examCount != examIds.size()) {
+                throw new BaseBizException(HttpStatus.BAD_REQUEST, "考试 ID 不存在");
+            }
+
+            var examVacancies = examIds.stream()
+                    .map(examId -> ExamVacancy.builder()
+                            .examId(examId)
+                            .vacancyId(vacancyId)
+                            .build())
+                    .toList();
+
+            // 异步存储岗位与考试的绑定信息
+            var saveExamVacanciesTask = CompletableFuture.runAsync(
+                    () -> examVacancyRepository.insertBatch(examVacancies), ConcurrentConfig.CACHED_EXECUTORS);
+
+            CompletableFuture.allOf(saveVacancyTask, saveExamVacanciesTask).join();
+        } else {
+            saveVacancyTask.join();
+        }
+
         return vacancy;
     }
+
 
     public Vacancy updateVacancy(Vacancy vacancy, List<Long> examIds) {
         var examCount = examService.countExamsByExamIds(examIds);
@@ -140,5 +175,15 @@ public class VacancyService {
                 () -> examVacancyRepository.deleteByCondition(ExamVacancy.EXAM_VACANCY.VACANCY_ID.eq(vacancyId)),
                 ConcurrentConfig.CACHED_EXECUTORS);
         CompletableFuture.allOf(deleteVacancyTask, deleteExamVacancyTask).join();
+    }
+
+    /**
+     * 根据考试 ID 删除考试岗位信息。
+     *
+     * @param examId 考试 ID
+     * @return 被删除的行数
+     */
+    public int deleteExamVacanciesByExamId(Long examId) {
+        return examVacancyRepository.deleteByCondition(ExamVacancy.EXAM_VACANCY.EXAM_ID.eq(examId));
     }
 }

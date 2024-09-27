@@ -2,7 +2,6 @@ package com.ahgtgk.scoresense.service;
 
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.onixbyte.guid.GuidCreator;
 import com.ahgtgk.scoresense.entity.Exam;
 import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.exception.BaseBizException;
@@ -11,12 +10,12 @@ import com.ahgtgk.scoresense.repository.ExamRepository;
 import com.ahgtgk.scoresense.repository.ExamTypeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 考试业务。
@@ -49,9 +48,23 @@ public class ExamService {
      * @param pageSize    页面大小
      * @return 考试分页数据
      */
-    public Page<Exam> getExamPage(Integer currentPage, Integer pageSize) {
-        return examRepository.paginate(currentPage, pageSize, QueryWrapper.create()
-                .orderBy(Exam.EXAM.ID, false));
+    public Page<Exam> getExamPage(Integer currentPage, Integer pageSize, String divisionCode, String name) {
+        var queryWrapper = QueryWrapper.create();
+
+        Optional.ofNullable(divisionCode)
+                .filter((_divisionCode) -> !_divisionCode.isBlank())
+                .ifPresent((_divisionCode) -> {
+                    if (_divisionCode.length() == 2) {
+                        queryWrapper.and(Exam.EXAM.PROVINCE.eq(_divisionCode));
+                    } else if (_divisionCode.length() == 4) {
+                        queryWrapper.and(Exam.EXAM.PREFECTURE.eq(_divisionCode));
+                    }
+                });
+        Optional.ofNullable(name)
+                .filter((_name) -> !_name.isBlank())
+                .ifPresent((_name) -> queryWrapper.and(Exam.EXAM.NAME.like(_name)));
+
+        return examRepository.paginate(currentPage, pageSize, queryWrapper.orderBy(Exam.EXAM.ID, false));
     }
 
     /**

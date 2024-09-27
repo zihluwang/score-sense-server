@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.controller;
 
+import com.ahgtgk.scoresense.model.request.ExamQueryRequest;
 import com.mybatisflex.core.paginate.Page;
 import com.ahgtgk.scoresense.entity.Exam;
 import com.ahgtgk.scoresense.entity.ExamType;
@@ -37,8 +38,9 @@ public class ExamController {
      */
     @GetMapping("/")
     public Page<ExamView> getExams(@RequestParam(required = false, defaultValue = "1") Integer currentPage,
-                                   @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
-        return examService.getExamPage(currentPage, pageSize).map(Exam::toView);
+                                   @RequestParam(required = false, defaultValue = "10") Integer pageSize,
+                                   @ModelAttribute ExamQueryRequest request) {
+        return examService.getExamPage(currentPage, pageSize, request.divisionCode(), request.name()).map(Exam::toView);
     }
 
     /**

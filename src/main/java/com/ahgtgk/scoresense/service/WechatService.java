@@ -24,7 +24,6 @@ import java.util.*;
 @Service
 public class WechatService {
 
-
     private final WebClient wechatClient;
     private final WechatProperty wechatProperty;
     private final WechatCache wechatCache;
@@ -51,7 +50,7 @@ public class WechatService {
      *
      * @return 微信 AccessToken
      */
-    protected String fetchAccessToken() {
+    public String fetchAccessToken() {
         var response = wechatClient.get()
                 .uri((uriBuilder) -> uriBuilder.path("/cgi-bin/token")
                         .queryParam("grant_type", "client_credential")
@@ -74,6 +73,11 @@ public class WechatService {
         throw new BaseBizException(HttpStatus.SERVICE_UNAVAILABLE, "微信服务繁忙，请稍后再试");
     }
 
+    /**
+     * 获取微信 AccessToken。
+     *
+     * @return 微信 AccessToken
+     */
     public String getAccessToken() {
         var accessToken = wechatCache.getAccessToken();
         if (Objects.isNull(accessToken) || accessToken.isBlank()) {
@@ -84,6 +88,12 @@ public class WechatService {
         return accessToken;
     }
 
+    /**
+     * 获取分享小程序码。
+     *
+     * @param request 分享小程序码请求
+     * @return 文件信息
+     */
     public AttachmentView fetchShareQrcode(ShareQrcodeRequest request) {
         var requestBody = new HashMap<String, Object>();
 

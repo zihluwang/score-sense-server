@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.view.VacancyView;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -57,6 +58,15 @@ public class Vacancy {
             var key = getNameWithSchema() + "." + alias;
             return getCache(key, (k) -> new VacancyTableDef("", "vacancy", alias));
         }
+    }
+
+    public VacancyView toView() {
+        return VacancyView.builder()
+                .id(String.valueOf(id))
+                .name(name)
+                .province(province)
+                .prefecture(prefecture)
+                .build();
     }
 
 }

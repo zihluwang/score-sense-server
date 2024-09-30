@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.config;
 
+import com.ahgtgk.scoresense.filter.AuthenticationTokenFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration
@@ -20,9 +22,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   CorsConfigurationSource corsConfigurationSource) throws Exception {
+                                                   CorsConfigurationSource corsConfigurationSource, AuthenticationTokenFilter authenticationTokenFilter) throws Exception {
         return http
-                .cors((config) -> config.configurationSource(corsConfigurationSource))
+                .cors((cors) -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers((headers) -> headers
                         .cacheControl(HeadersConfigurer.CacheControlConfig::disable)
@@ -32,6 +34,7 @@ public class SecurityConfig {
                         .requestMatchers("/error", "/users/login").permitAll()
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 

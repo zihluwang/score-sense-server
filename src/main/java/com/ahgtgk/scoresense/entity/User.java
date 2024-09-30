@@ -1,12 +1,12 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.domain.UserDomain;
 import com.ahgtgk.scoresense.enumeration.UserType;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
-import com.ahgtgk.scoresense.model.payload.UserPayload;
 import com.ahgtgk.scoresense.view.UserView;
 import lombok.*;
 
@@ -114,11 +114,13 @@ public class User {
      *
      * @return Token 中的载荷
      */
-    public UserPayload toPayload() {
-        return UserPayload.builder()
+    public UserDomain toDomain() {
+        return UserDomain.builder()
                 .id(id)
                 .username(username)
                 .password(password)
+                .avatarId(avatarId)
+                .phoneNumber(phoneNumber)
                 .userType(openId != null ? UserType.USER : UserType.ADMIN)
                 .nonLocked(nonLocked)
                 .build();

@@ -23,7 +23,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return Optional.ofNullable(userRepository.selectOneByCondition(User.USER.USERNAME.eq(username)))
-                .map(User::toPayload)
+                .map(User::toDomain)
                 .orElseThrow(() -> new UsernameNotFoundException("用户身份凭证不正确"));
     }
 

@@ -8,4 +8,13 @@ Content-Type: application/json
   "password": "zhangsan"
 }
 
+### Wechat User Login
+POST /users/login
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "code": "0e141R0w35t8A33JN52w3ChvgJ241R0G"
+}
+
 ###

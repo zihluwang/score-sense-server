@@ -1,15 +1,18 @@
-package com.ahgtgk.scoresense.model.payload;
+package com.ahgtgk.scoresense.domain;
 
 import com.ahgtgk.scoresense.entity.User;
 import com.ahgtgk.scoresense.enumeration.UserType;
 import com.ahgtgk.scoresense.view.UserView;
 import com.onixbyte.simplejwt.TokenPayload;
-import lombok.*;
+import com.onixbyte.simplejwt.annotations.ExcludeFromPayload;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.management.relation.Role;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,23 +25,49 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPayload implements TokenPayload, UserDetails {
+public class UserDomain implements TokenPayload, UserDetails {
 
     private Long id;
 
     private String username;
 
+    @ExcludeFromPayload
     private String password;
 
     private UserType userType;
 
+    private Long avatarId;
+
+    private String phoneNumber;
+
     private Boolean nonLocked;
 
+    /**
+     * 将持久层对象转换为视图层对象。
+     *
+     * @return 用户视图
+     */
     public User toPersistent() {
         return User.builder()
                 .id(id)
                 .username(username)
-                .password(password)
+                .phoneNumber(phoneNumber)
+                .avatarId(avatarId)
+                .nonLocked(nonLocked)
+                .build();
+    }
+
+    /**
+     * 将持久层对象转换为视图层对象。
+     *
+     * @return 用户视图
+     */
+    public UserView toView() {
+        return UserView.builder()
+                .id(String.valueOf(id))
+                .username(username)
+                .phoneNumber(phoneNumber)
+                .avatarId(String.valueOf(avatarId))
                 .nonLocked(nonLocked)
                 .build();
     }

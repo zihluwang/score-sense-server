@@ -1,8 +1,9 @@
 package com.ahgtgk.scoresense.controller;
 
+import com.ahgtgk.scoresense.cache.UserCache;
+import com.ahgtgk.scoresense.domain.UserDomain;
 import com.ahgtgk.scoresense.entity.User;
 import com.ahgtgk.scoresense.exception.UnauthenticatedException;
-import com.ahgtgk.scoresense.model.payload.UserPayload;
 import com.ahgtgk.scoresense.repository.UserRepository;
 import com.ahgtgk.scoresense.service.UserService;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -12,14 +13,11 @@ import com.ahgtgk.scoresense.model.request.UserLoginOrRegisterRequest;
 import com.ahgtgk.scoresense.service.WechatService;
 import com.ahgtgk.scoresense.view.UserView;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +40,7 @@ public class UserController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
+    private final UserCache userCache;
 
     public UserController(TokenResolver<DecodedJWT> tokenResolver,
                           @Qualifier("userIdCreator") GuidCreator<Long> userIdCreator,
@@ -49,7 +48,7 @@ public class UserController {
                           PasswordEncoder passwordEncoder,
                           UserRepository userRepository,
                           UserService userService,
-                          AuthenticationManager authenticationManager) {
+                          AuthenticationManager authenticationManager, UserCache userCache) {
         this.tokenResolver = tokenResolver;
         this.userIdCreator = userIdCreator;
         this.wechatService = wechatService;
@@ -57,6 +56,7 @@ public class UserController {
         this.userRepository = userRepository;
         this.userService = userService;
         this.authenticationManager = authenticationManager;
+        this.userCache = userCache;
     }
 
     @PostMapping("/login")
@@ -89,11 +89,14 @@ public class UserController {
                 UsernamePasswordAuthenticationToken.unauthenticated(user.getUsername(), user.getOpenId());
         var authentication = authenticationManager.authenticate(authenticationToken);
 
-        if (authentication.getPrincipal() instanceof UserPayload userPayload) {
-            var token = tokenResolver.createToken(Duration.ofDays(30), String.valueOf(userPayload.getId()), "ScoreSense:" + userPayload.getUserType().name());
+        if (authentication.getPrincipal() instanceof UserDomain userDomain) {
+            var token = tokenResolver.createToken(Duration.ofDays(30),
+                    "ScoreSense:" + userDomain.getUserType().name(),
+                    String.valueOf(userDomain.getId()));
+            userCache.putUser(userDomain.toPersistent());
             return ResponseEntity.status(HttpStatus.OK)
                     .header("Authorization", token)
-                    .body(user.toView());
+                    .body(userDomain.toView());
         } else {
             throw new UnauthenticatedException();
         }

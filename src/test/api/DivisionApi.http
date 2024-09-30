@@ -1,0 +1,8 @@
+@adminToken = eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTY29yZVNlbnNlIiwiaWF0IjoxNzI3NjgyODE0LCJuYmYiOjE3Mjc2ODI4MTQsImF1ZCI6IlNjb3JlU2Vuc2U6QURNSU4iLCJzdWIiOiI3MjM5MTY1NTY1MjA4NjI1MTUyIiwiZXhwIjoxNzMwMjc0ODE0LCJqdGkiOiI4OWI1MzZiYi1lODk1LTQ3OGUtODQ0Ny03YThkYTUzMTJmMzcifQ.41r-jrpU4muwyVxMXq_KfahkWJ6T0EA9qYFZc239MsH5USN7R2Zl7y6xpBgjvka0e8BfjAKGF6dawiYvvc8j8Q
+
+### Get Divisions
+GET /divisions/
+Host: localhost:8080
+Authorization: {{adminToken}}
+
+###

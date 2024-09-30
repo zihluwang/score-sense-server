@@ -9,19 +9,19 @@ import java.time.Duration;
 @Component
 public class WechatCache {
 
-    private final RedisTemplate<String, String> wechatAccessTokenRedisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
-    public WechatCache(@Qualifier("wechatAccessTokenRedisTemplate") RedisTemplate<String, String> wechatAccessTokenRedisTemplate) {
-        this.wechatAccessTokenRedisTemplate = wechatAccessTokenRedisTemplate;
+    public WechatCache(@Qualifier("wechatRedisTemplate") RedisTemplate<String, String> redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
     public void saveAccessToken(String accessToken) {
-        wechatAccessTokenRedisTemplate.opsForValue()
+        redisTemplate.opsForValue()
                 .set("score-sense:wechat:access-token", accessToken, Duration.ofSeconds(7200));
     }
 
     public String getAccessToken() {
-        return wechatAccessTokenRedisTemplate.opsForValue().get("score-sense:wechat:access-token");
+        return redisTemplate.opsForValue().get("score-sense:wechat:access-token");
     }
 
 }

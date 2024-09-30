@@ -1,12 +1,12 @@
 package com.ahgtgk.scoresense.model.request;
 
-import com.ahgtgk.scoresense.enumeration.SwipeStatus;
+import com.ahgtgk.scoresense.enumeration.Status;
 import lombok.Builder;
 
 @Builder
 public record CreateSwipeRequest(
         String name,
-        SwipeStatus status,
+        Status status,
         Long imageId
 ) {
 }

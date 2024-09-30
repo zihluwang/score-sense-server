@@ -15,11 +15,11 @@ import java.time.ZoneId;
  * @author zihluwang
  */
 @Getter
-public class BaseBizException extends RuntimeException {
+public class BizException extends RuntimeException {
 
     private final HttpStatus status;
 
-    public BaseBizException(HttpStatus status, String message) {
+    public BizException(HttpStatus status, String message) {
         super(message);
         this.status = status;
     }

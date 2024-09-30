@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.enumeration.Status;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -53,6 +54,11 @@ public class Exam {
      */
     private String prefecture;
 
+    /**
+     * 考试的状态
+     */
+    private Status status;
+
     public static final ExamTableDef EXAM = new ExamTableDef();
 
     public ExamView toView() {
@@ -63,6 +69,7 @@ public class Exam {
                 .description(description)
                 .province(province)
                 .prefecture(prefecture)
+                .status(status.getCode())
                 .build();
     }
 
@@ -80,9 +87,11 @@ public class Exam {
 
         public final QueryColumn PREFECTURE = new QueryColumn(this, "prefecture");
 
+        public final QueryColumn STATUS = new QueryColumn(this, "status");
+
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, NAME, DESCRIPTION, PROVINCE, PREFECTURE};
+        public final QueryColumn[] DEFAULT_COLUMNS = {ID, NAME, TYPE, DESCRIPTION, PROVINCE, PREFECTURE, STATUS};
 
         private ExamTableDef() {
             super("", "exam");

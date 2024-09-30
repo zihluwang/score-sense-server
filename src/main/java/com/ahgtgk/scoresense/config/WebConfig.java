@@ -1,71 +1,35 @@
 package com.ahgtgk.scoresense.config;
 
-import com.ahgtgk.scoresense.enumeration.SwipeStatus;
-import com.ahgtgk.scoresense.interceptor.AdminInterceptor;
+import com.ahgtgk.scoresense.enumeration.Status;
 import com.ahgtgk.scoresense.interceptor.CommonInterceptor;
-import com.ahgtgk.scoresense.interceptor.UserInterceptor;
 import com.ahgtgk.scoresense.property.CorsProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 @Configuration
 @EnableConfigurationProperties({CorsProperty.class})
 public class WebConfig implements WebMvcConfigurer {
 
-    private UserInterceptor userInterceptor;
-    private AdminInterceptor adminInterceptor;
-    private CorsProperty corsProperty;
     private CommonInterceptor commonInterceptor;
-    private Converter<String, SwipeStatus> swipeStatusConverter;
-
-    @Autowired
-    public void setUserInterceptor(UserInterceptor userInterceptor) {
-        this.userInterceptor = userInterceptor;
-    }
-
-    @Autowired
-    public void setAdminInterceptor(AdminInterceptor adminInterceptor) {
-        this.adminInterceptor = adminInterceptor;
-    }
-
-    @Autowired
-    public void setCorsProperty(CorsProperty corsProperty) {
-        this.corsProperty = corsProperty;
-    }
+    private Converter<String, Status> statusConverter;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(commonInterceptor)
                 .addPathPatterns("/**");
-
-        registry.addInterceptor(userInterceptor)
-                .addPathPatterns("/users/**")
-                .excludePathPatterns("/users/login");
-
-        registry.addInterceptor(adminInterceptor)
-                .addPathPatterns("/admins/**")
-                .excludePathPatterns("/admins/login");
-    }
-
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins(corsProperty.getAllowedOrigins())
-                .allowCredentials(corsProperty.getAllowCredentials())
-                .allowedMethods(Arrays.stream(corsProperty.getAllowedMethods())
-                        .map(RequestMethod::name)
-                        .toArray(String[]::new))
-                .allowedHeaders(corsProperty.getAllowedHeaders())
-                .exposedHeaders(corsProperty.getExposedHeaders());
     }
 
     @Autowired
@@ -75,11 +39,32 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(swipeStatusConverter);
+        registry.addConverter(statusConverter);
     }
 
     @Autowired
-    public void setSwipeStatusConverter(Converter<String, SwipeStatus> swipeStatusConverter) {
-        this.swipeStatusConverter = swipeStatusConverter;
+    public void setStatusConverter(Converter<String, Status> statusConverter) {
+        this.statusConverter = statusConverter;
     }
+
+    /**
+     * 跨域配置
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(CorsProperty corsProperty) {
+        var configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.stream(corsProperty.getAllowedOrigins()).toList());
+        configuration.setAllowedMethods(Arrays.stream(corsProperty.getAllowedMethods()).map(RequestMethod::name).toList());
+        configuration.setAllowedHeaders(Arrays.stream(corsProperty.getAllowedHeaders()).toList());
+        configuration.setExposedHeaders(Arrays.stream(corsProperty.getExposedHeaders()).toList());
+
+        Optional.of(corsProperty)
+                .map(CorsProperty::getAllowCredentials)
+                .ifPresent(configuration::setAllowCredentials);
+
+        var source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
 }

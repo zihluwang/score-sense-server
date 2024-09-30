@@ -1,7 +1,6 @@
 package com.ahgtgk.scoresense.controller;
 
 import com.ahgtgk.scoresense.model.response.ProvinceResponse;
-import com.ahgtgk.scoresense.service.DivisionService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +11,7 @@ import java.util.List;
 @RequestMapping("/divisions")
 public class DivisionController {
 
+    /*
     private final DivisionService divisionService;
 
     public DivisionController(DivisionService divisionService) {
@@ -21,6 +21,6 @@ public class DivisionController {
     @GetMapping("/")
     public List<ProvinceResponse> getDivisions() {
         return divisionService.getAllDivisions();
-    }
+    } */
 
 }

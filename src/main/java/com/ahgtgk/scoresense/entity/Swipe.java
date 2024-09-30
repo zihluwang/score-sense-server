@@ -5,7 +5,7 @@ import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
-import com.ahgtgk.scoresense.enumeration.SwipeStatus;
+import com.ahgtgk.scoresense.enumeration.Status;
 import com.ahgtgk.scoresense.view.SwipeView;
 import lombok.*;
 
@@ -35,7 +35,7 @@ public class Swipe {
     /**
      * 轮播图次序。
      */
-    private SwipeStatus status;
+    private Status status;
 
     /**
      * 图片 URL。

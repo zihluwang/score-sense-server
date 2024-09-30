@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.Arrays;
 
 @Getter
-public enum SwipeStatus {
+public enum Status {
 
     ENABLED(1),
     DISABLED(0);
@@ -14,11 +14,11 @@ public enum SwipeStatus {
     @EnumValue
     private final Integer code;
 
-    SwipeStatus(Integer code) {
+    Status(Integer code) {
         this.code = code;
     }
 
-    public static SwipeStatus byCode(Integer code) {
+    public static Status byCode(Integer code) {
         return Arrays.stream(values())
                 .filter((item) -> code.equals(item.code))
                 .findFirst()

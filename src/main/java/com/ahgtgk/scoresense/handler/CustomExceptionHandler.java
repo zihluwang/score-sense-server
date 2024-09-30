@@ -1,6 +1,6 @@
 package com.ahgtgk.scoresense.handler;
 
-import com.ahgtgk.scoresense.exception.BaseBizException;
+import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.exception.InvalidAuthenticationException;
 import com.ahgtgk.scoresense.holder.RequestContextHolder;
 import com.ahgtgk.scoresense.model.response.ExceptionResponse;
@@ -22,8 +22,8 @@ public class CustomExceptionHandler {
         return e.composeResponse();
     }
 
-    @ExceptionHandler(BaseBizException.class)
-    public ResponseEntity<? extends ExceptionResponse> handleBaseBizException(BaseBizException e) {
+    @ExceptionHandler(BizException.class)
+    public ResponseEntity<? extends ExceptionResponse> handleBaseBizException(BizException e) {
         return e.composeResponse();
     }
 

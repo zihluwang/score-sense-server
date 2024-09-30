@@ -1,15 +1,26 @@
 package com.ahgtgk.scoresense.controller;
 
+import com.ahgtgk.scoresense.entity.User;
+import com.ahgtgk.scoresense.exception.UnauthenticatedException;
+import com.ahgtgk.scoresense.model.payload.UserPayload;
+import com.ahgtgk.scoresense.repository.UserRepository;
+import com.ahgtgk.scoresense.service.UserService;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.onixbyte.guid.GuidCreator;
 import com.onixbyte.simplejwt.TokenResolver;
-import com.ahgtgk.scoresense.entity.User;
 import com.ahgtgk.scoresense.model.request.UserLoginOrRegisterRequest;
-import com.ahgtgk.scoresense.service.UserService;
 import com.ahgtgk.scoresense.service.WechatService;
 import com.ahgtgk.scoresense.view.UserView;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.internal.constraintvalidators.bv.AssertFalseValidator;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Duration;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -24,53 +36,67 @@ import java.util.Objects;
 public class UserController {
 
     private final TokenResolver<DecodedJWT> tokenResolver;
-    private final UserService userService;
     private final GuidCreator<Long> userIdCreator;
     private final WechatService wechatService;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    private final AuthenticationManager authenticationManager;
 
     public UserController(TokenResolver<DecodedJWT> tokenResolver,
-                          UserService userService,
                           @Qualifier("userIdCreator") GuidCreator<Long> userIdCreator,
-                          WechatService wechatService) {
+                          WechatService wechatService,
+                          PasswordEncoder passwordEncoder,
+                          UserRepository userRepository,
+                          UserService userService,
+                          AuthenticationManager authenticationManager) {
         this.tokenResolver = tokenResolver;
-        this.userService = userService;
         this.userIdCreator = userIdCreator;
         this.wechatService = wechatService;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+        this.userService = userService;
+        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("/login")
-    public UserView login(@RequestBody UserLoginOrRegisterRequest request) {
-        // 获取微信用户信息
-        var wechatUserOpenId = wechatService.getWechatUserOpenId(request.code());
+    public ResponseEntity<UserView> login(@RequestBody UserLoginOrRegisterRequest request) {
+        var isAdmin = true;
+        var user = User.builder().build();
 
-        // 根据微信用户 OpenID 查询用户数据库信息
-        var user = userService.getUserByOpenId(wechatUserOpenId);
-
-        if (Objects.isNull(user)) { // 用户信息为空，注册账户
-            var userId = userIdCreator.nextId();
-            user = User.builder()
-                    .id(userId)
-                    .username("用户" + userId)
-                    .isBlocked(false)
-                    .openId(wechatUserOpenId)
-                    .phoneNumber("")
-                    .avatarId(0L)
-                    .build();
-            userService.createUser(user);
+        if (Objects.nonNull(request.code()) && !request.code().isBlank()) { // 执行微信用户登录逻辑
+            var openId = wechatService.getWechatUserOpenId(request.code());
+            user = Optional.ofNullable(userRepository.selectOneByCondition(User.USER.OPEN_ID.eq(openId)))
+                    .orElseGet(() -> { // 用户不存在，执行注册
+                        var userId = userIdCreator.nextId();
+                        var _user = User.builder()
+                                .id(userId)
+                                .openId(openId)
+                                .username("微信用户" + userId)
+                                .password(passwordEncoder.encode(openId))
+                                .nonLocked(true)
+                                .avatarId(0L)
+                                .phoneNumber("")
+                                .build();
+                        userService.createUser(_user);
+                        return _user;
+                    });
+            isAdmin = false;
         }
 
-        // 创建用户令牌
-        var token = tokenResolver.createToken(Duration.ofDays(30), user.getUsername(), "ScoreSense-Miniapp-User", user.toPayload());
-        // 返回用户信息
-        return UserView.builder()
-                .id(user.getId())
-                .openId(user.getOpenId())
-                .username(user.getUsername())
-                .phoneNumber(user.getPhoneNumber())
-                .avatarId(user.getAvatarId())
-                .isBlocked(user.getIsBlocked())
-                .token(token)
-                .build();
+        var authenticationToken = isAdmin ?
+                UsernamePasswordAuthenticationToken.unauthenticated(request.username(), request.password()) :
+                UsernamePasswordAuthenticationToken.unauthenticated(user.getUsername(), user.getOpenId());
+        var authentication = authenticationManager.authenticate(authenticationToken);
+
+        if (authentication.getPrincipal() instanceof UserPayload userPayload) {
+            var token = tokenResolver.createToken(Duration.ofDays(30), String.valueOf(userPayload.getId()), "ScoreSense:" + userPayload.getUserType().name());
+            return ResponseEntity.status(HttpStatus.OK)
+                    .header("Authorization", token)
+                    .body(user.toView());
+        } else {
+            throw new UnauthenticatedException();
+        }
     }
 
 }

@@ -1,11 +1,12 @@
 package com.ahgtgk.scoresense.service;
 
-import com.onixbyte.guid.GuidCreator;
 import com.ahgtgk.scoresense.entity.Attachment;
-import com.ahgtgk.scoresense.exception.BaseBizException;
+import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.request.UploadAttachmentRequest;
 import com.ahgtgk.scoresense.repository.AttachmentRepository;
+import com.onixbyte.guid.GuidCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,14 @@ import java.util.Objects;
 @Service
 public class AttachmentService {
 
-    private final GuidCreator<Long> attachmentIdCreator;
     private final AttachmentRepository attachmentRepository;
+    private final GuidCreator<Long> attachmentIdCreator;
 
-    public AttachmentService(@Qualifier("attachmentIdCreator") GuidCreator<Long> attachmentIdCreator,
-                             AttachmentRepository attachmentRepository) {
-        this.attachmentIdCreator = attachmentIdCreator;
+    @Autowired
+    public AttachmentService(AttachmentRepository attachmentRepository,
+                             @Qualifier("attachmentIdCreator") GuidCreator<Long> attachmentIdCreator) {
         this.attachmentRepository = attachmentRepository;
+        this.attachmentIdCreator = attachmentIdCreator;
     }
 
     public Attachment saveAttachment(UploadAttachmentRequest request) {
@@ -44,7 +46,7 @@ public class AttachmentService {
                 if (folder.mkdir()) {
                     log.info("uploads directory created.");
                 } else {
-                    throw new BaseBizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法创建上传文件夹");
+                    throw new BizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法创建上传文件夹");
                 }
             }
 
@@ -64,7 +66,7 @@ public class AttachmentService {
             attachmentRepository.insert(attachment);
             return attachment;
         } catch (IOException e) {
-            throw new BaseBizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法保存文件！");
+            throw new BizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法保存文件！");
         }
     }
 
@@ -78,7 +80,7 @@ public class AttachmentService {
     private Path getDestinationPath(MultipartFile file, String name) {
         var originalFilename = file.getOriginalFilename();
         if (Objects.isNull(originalFilename)) {
-            throw new BaseBizException(HttpStatus.BAD_REQUEST, "文件名不能为空");
+            throw new BizException(HttpStatus.BAD_REQUEST, "文件名不能为空");
         }
         var _indexOfSeparator = originalFilename.lastIndexOf('.');
         var extension = originalFilename.substring(_indexOfSeparator + 1);

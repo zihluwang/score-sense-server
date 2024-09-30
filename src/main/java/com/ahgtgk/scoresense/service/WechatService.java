@@ -5,7 +5,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onixbyte.guid.GuidCreator;
 import com.ahgtgk.scoresense.cache.WechatCache;
-import com.ahgtgk.scoresense.exception.BaseBizException;
+import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.extension.spring.ByteArrayMultipartFile;
 import com.ahgtgk.scoresense.model.request.ShareQrcodeRequest;
 import com.ahgtgk.scoresense.model.request.UploadAttachmentRequest;
@@ -63,14 +63,14 @@ public class WechatService {
                 .block();
 
         if (Objects.isNull(response)) {
-            throw new BaseBizException(HttpStatus.INTERNAL_SERVER_ERROR, "与微信的网络连接中断，请稍后再试");
+            throw new BizException(HttpStatus.INTERNAL_SERVER_ERROR, "与微信的网络连接中断，请稍后再试");
         }
 
         var responseAccessToken = response.get("access_token");
         if (responseAccessToken instanceof String plainAccessToken) {
             return plainAccessToken;
         }
-        throw new BaseBizException(HttpStatus.SERVICE_UNAVAILABLE, "微信服务繁忙，请稍后再试");
+        throw new BizException(HttpStatus.SERVICE_UNAVAILABLE, "微信服务繁忙，请稍后再试");
     }
 
     /**
@@ -123,7 +123,7 @@ public class WechatService {
                 .block();
 
         if (Objects.isNull(image)) {
-            throw new BaseBizException(HttpStatus.BAD_GATEWAY, "微信服务暂不可用，请稍后重试");
+            throw new BizException(HttpStatus.BAD_GATEWAY, "微信服务暂不可用，请稍后重试");
         }
 
         var attachment = attachmentService.saveAttachment(UploadAttachmentRequest.builder()
@@ -167,7 +167,7 @@ public class WechatService {
 
             return resultMap.get("openid");
         } catch (JsonProcessingException e) {
-            throw new BaseBizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法解析用户信息");
+            throw new BizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法解析用户信息");
         }
     }
 

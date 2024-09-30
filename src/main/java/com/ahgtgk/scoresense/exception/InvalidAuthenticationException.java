@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-public class InvalidAuthenticationException extends BaseBizException {
+public class InvalidAuthenticationException extends BizException {
     public InvalidAuthenticationException() {
         super(HttpStatus.UNAUTHORIZED, "用户名或密码错误。");
     }

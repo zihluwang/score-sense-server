@@ -5,7 +5,6 @@ import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
-import com.ahgtgk.scoresense.enumeration.QuestionType;
 import lombok.*;
 
 /**

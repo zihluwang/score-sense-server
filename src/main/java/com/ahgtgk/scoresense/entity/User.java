@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.enumeration.UserType;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -40,6 +41,11 @@ public class User {
     private String username;
 
     /**
+     * 密码。
+     */
+    private String password;
+
+    /**
      * 用户手机号码。
      */
     private String phoneNumber;
@@ -52,7 +58,7 @@ public class User {
     /**
      * 用户账户是否被封禁。
      */
-    private Boolean isBlocked;
+    private Boolean nonLocked;
 
     public static final UserTableDef USER = new UserTableDef();
 
@@ -68,9 +74,9 @@ public class User {
 
         public final QueryColumn AVATAR_ID = new QueryColumn(this, "avatar_id");
 
-        public final QueryColumn IS_BLOCKED = new QueryColumn(this, "is_blocked");
+        public final QueryColumn NON_LOCKED = new QueryColumn(this, "non_locked");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, OPEN_ID, USERNAME, PHONE_NUMBER, AVATAR_ID, IS_BLOCKED};
+        public final QueryColumn[] DEFAULT_COLUMNS = {ID, OPEN_ID, USERNAME, PHONE_NUMBER, AVATAR_ID, NON_LOCKED};
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
@@ -95,12 +101,11 @@ public class User {
      */
     public UserView toView() {
         return UserView.builder()
-                .id(id)
-                .openId(openId)
+                .id(String.valueOf(id))
                 .username(username)
                 .phoneNumber(phoneNumber)
-                .avatarId(avatarId)
-                .isBlocked(isBlocked)
+                .avatarId(String.valueOf(avatarId))
+                .nonLocked(nonLocked)
                 .build();
     }
 
@@ -112,7 +117,10 @@ public class User {
     public UserPayload toPayload() {
         return UserPayload.builder()
                 .id(id)
-                .openId(openId)
+                .username(username)
+                .password(password)
+                .userType(openId != null ? UserType.USER : UserType.ADMIN)
+                .nonLocked(nonLocked)
                 .build();
     }
 

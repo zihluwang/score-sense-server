@@ -9,6 +9,7 @@ public record ExamView(
         Integer type,
         String description,
         String province,
-        String prefecture
+        String prefecture,
+        Integer status
 ) {
 }

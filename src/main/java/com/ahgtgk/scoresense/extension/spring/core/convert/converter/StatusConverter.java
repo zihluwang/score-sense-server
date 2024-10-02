@@ -1,4 +1,4 @@
-package com.ahgtgk.scoresense.extension.spring.converter;
+package com.ahgtgk.scoresense.extension.spring.core.convert.converter;
 
 import com.ahgtgk.scoresense.enumeration.Status;
 import lombok.NonNull;

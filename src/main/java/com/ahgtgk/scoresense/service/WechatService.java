@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onixbyte.guid.GuidCreator;
 import com.ahgtgk.scoresense.cache.WechatCache;
 import com.ahgtgk.scoresense.exception.BizException;
-import com.ahgtgk.scoresense.extension.spring.ByteArrayMultipartFile;
+import com.ahgtgk.scoresense.extension.spring.web.multipart.ByteArrayMultipartFile;
 import com.ahgtgk.scoresense.model.request.ShareQrcodeRequest;
 import com.ahgtgk.scoresense.model.request.UploadAttachmentRequest;
 import com.ahgtgk.scoresense.property.WechatProperty;

@@ -1,4 +1,4 @@
-package com.ahgtgk.scoresense.extension.spring;
+package com.ahgtgk.scoresense.extension.spring.web.multipart;
 
 import lombok.Builder;
 import lombok.NonNull;

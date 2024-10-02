@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.model.request;
 
+import com.ahgtgk.scoresense.enumeration.Status;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
@@ -11,6 +12,7 @@ public record UpdateExamRequest(
         Integer type,
         String description,
         String province,
-        String prefecture
+        String prefecture,
+        Status status
 ) {
 }

@@ -46,4 +46,13 @@ public class ExamVacancyService {
         examVacancyRepository.deleteByCondition(ExamVacancy.EXAM_VACANCY.VACANCY_ID.eq(vacancyId));
     }
 
+    /**
+     * 删除与指定 examId 相关的所有关联
+     *
+     * @param examId 岗位 ID
+     */
+    public void deleteByExamId(Long examId) {
+        examVacancyRepository.deleteByCondition(ExamVacancy.EXAM_VACANCY.EXAM_ID.eq(examId));
+    }
+
 }

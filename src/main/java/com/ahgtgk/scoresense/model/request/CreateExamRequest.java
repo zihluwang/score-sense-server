@@ -1,6 +1,6 @@
 package com.ahgtgk.scoresense.model.request;
 
-import jakarta.validation.constraints.Min;
+import com.ahgtgk.scoresense.enumeration.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -20,6 +20,7 @@ public record CreateExamRequest(
         @NotBlank(message = "考试举办地不能为空")
         String province,
         @NotBlank(message = "考试举办地不能为空")
-        String prefecture
+        String prefecture,
+        Status status
 ) {
 }

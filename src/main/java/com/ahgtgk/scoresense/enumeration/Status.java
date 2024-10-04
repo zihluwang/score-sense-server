@@ -2,14 +2,17 @@ package com.ahgtgk.scoresense.enumeration;
 
 import com.mybatisflex.annotation.EnumValue;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Arrays;
 
+@Slf4j
 @Getter
 public enum Status {
 
+    DISABLED(0),
     ENABLED(1),
-    DISABLED(0);
+    ;
 
     @EnumValue
     private final Integer code;

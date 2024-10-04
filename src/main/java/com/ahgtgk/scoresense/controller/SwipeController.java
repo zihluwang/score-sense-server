@@ -66,7 +66,7 @@ public class SwipeController {
      * @param request 创建轮播图请求
      */
     @PostMapping("/")
-    public SwipeView addSwipe(@Valid @RequestBody CreateSwipeRequest request) {
+    public SwipeView createSwipe(@Valid @RequestBody CreateSwipeRequest request) {
         return swipeService.createSwipe(request).toView();
     }
 

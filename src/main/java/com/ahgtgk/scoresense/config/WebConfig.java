@@ -24,7 +24,6 @@ import java.util.Optional;
 public class WebConfig implements WebMvcConfigurer {
 
     private CommonInterceptor commonInterceptor;
-    private Converter<String, Status> statusConverter;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -35,16 +34,6 @@ public class WebConfig implements WebMvcConfigurer {
     @Autowired
     public void setCommonInterceptor(CommonInterceptor commonInterceptor) {
         this.commonInterceptor = commonInterceptor;
-    }
-
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-        registry.addConverter(statusConverter);
-    }
-
-    @Autowired
-    public void setStatusConverter(Converter<String, Status> statusConverter) {
-        this.statusConverter = statusConverter;
     }
 
     /**

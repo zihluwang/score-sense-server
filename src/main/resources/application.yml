@@ -6,5 +6,4 @@ onixbyte:
 
 logging:
   level:
-    com.ronglankj.scoresense:
-      controller: debug
+    com.ahgtgk.scoresense: trace

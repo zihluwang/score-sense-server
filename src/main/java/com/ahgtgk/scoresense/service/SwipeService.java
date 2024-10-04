@@ -2,6 +2,7 @@ package com.ahgtgk.scoresense.service;
 
 import com.ahgtgk.scoresense.entity.Swipe;
 import com.ahgtgk.scoresense.enumeration.Status;
+import com.ahgtgk.scoresense.exception.DataConflictException;
 import com.ahgtgk.scoresense.model.criteria.SearchSwipeCriteria;
 import com.ahgtgk.scoresense.model.request.CreateSwipeRequest;
 import com.ahgtgk.scoresense.model.request.UpdateSwipeRequest;
@@ -66,14 +67,20 @@ public class SwipeService {
     /**
      * 创建轮播图。若轮播图状态未设置，将会使用 {@link Status#DISABLED} 作为默认值。
      *
-     * @param createSwipeRequest 创建轮播图请求
+     * @param request 创建轮播图请求
      */
-    public Swipe createSwipe(CreateSwipeRequest createSwipeRequest) {
+    public Swipe createSwipe(CreateSwipeRequest request) {
+        var canCreate = swipeRepository.selectCountByCondition(Swipe.SWIPE.NAME.eq(request.name())) == 0;
+        if (!canCreate) {
+            throw new DataConflictException("轮播图名称");
+        }
+
         var swipe = Swipe.builder()
                 .id(swipeIdCreator.nextId())
-                .name(createSwipeRequest.name())
-                .imageId(createSwipeRequest.imageId())
-                .status(Optional.ofNullable(createSwipeRequest.status()).orElse(Status.DISABLED))
+                .name(request.name())
+                .imageId(request.imageId())
+                .status(Optional.ofNullable(request.status())
+                        .orElse(Status.DISABLED))
                 .build();
 
         swipeRepository.insert(swipe);

@@ -18,4 +18,9 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({"db", "wechat", "dev", "cache"})
 class ScoreSenseApplicationTests {
 
+    @Test
+    void contextLoads() {
+
+    }
+
 }

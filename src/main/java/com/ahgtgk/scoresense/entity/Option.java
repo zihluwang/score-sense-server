@@ -1,5 +1,7 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.model.biz.BizOption;
+import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -45,7 +47,7 @@ public class Option {
     /**
      * 是否为正确选项。
      */
-    private Boolean isCorrect;
+    private Boolean correct;
 
     public static final OptionTableDef OPTION = new OptionTableDef();
 
@@ -59,9 +61,9 @@ public class Option {
 
         public final QueryColumn OPTION_TEXT = new QueryColumn(this, "option_text");
 
-        public final QueryColumn IS_CORRECT = new QueryColumn(this, "is_correct");
+        public final QueryColumn CORRECT = new QueryColumn(this, "correct");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, QUESTION_ID, ID, OPTION_TEXT, IS_CORRECT};
+        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, QUESTION_ID, ID, OPTION_TEXT, CORRECT};
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
@@ -77,6 +79,14 @@ public class Option {
             var key = getNameWithSchema() + "." + alias;
             return getCache(key, (k) -> new OptionTableDef("", "option", alias));
         }
+    }
+
+    public BizOption toBiz() {
+        return BizOption.builder()
+                .id(id)
+                .optionText(optionText)
+                .correct(correct)
+                .build();
     }
 
 }

@@ -3,6 +3,7 @@ package com.ahgtgk.scoresense.model.request;
 import com.ahgtgk.scoresense.enumeration.Status;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 /**
  * 创建考试的请求。
@@ -11,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
  * @param province   举办考试的省份代码
  * @param prefecture 举办考试的城市代码
  */
+@Builder
 public record CreateExamRequest(
         @NotBlank(message = "考试名称不能为空")
         String name,

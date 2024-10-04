@@ -1,11 +1,17 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.enumeration.AnswerType;
+import com.ahgtgk.scoresense.model.biz.BizOption;
+import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.table.TableDef;
 import lombok.*;
+
+import java.util.List;
 
 /**
  * 题目，用于存储每个题目的基本信息。
@@ -36,7 +42,12 @@ public class Question {
     /**
      * 考试类型。
      */
-    private QuestionType type;
+    private Integer type;
+
+    /**
+     * 考试题目作答类型。
+     */
+    private AnswerType answerType;
 
     /**
      * 题干。
@@ -63,13 +74,15 @@ public class Question {
 
         public final QueryColumn TYPE = new QueryColumn(this, "type");
 
+        public final QueryColumn ANSWER_TYPE = new QueryColumn(this, "answer_type");
+
         public final QueryColumn QUESTION_TEXT = new QueryColumn(this, "question_text");
 
         public final QueryColumn IMAGE_ID = new QueryColumn(this, "image_id");
 
         public final QueryColumn MAX_SCORE = new QueryColumn(this, "max_score");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, ID, TYPE, QUESTION_TEXT, IMAGE_ID, MAX_SCORE};
+        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, ID, TYPE, ANSWER_TYPE, QUESTION_TEXT, IMAGE_ID, MAX_SCORE};
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
@@ -85,6 +98,29 @@ public class Question {
             var key = getNameWithSchema() + "." + alias;
             return getCache(key, (k) -> new QuestionTableDef("", "question", alias));
         }
+    }
+
+    public BizQuestion toBiz() {
+        return BizQuestion.builder()
+                .id(id)
+                .type(type)
+                .answerType(answerType)
+                .questionText(questionText)
+                .imageId(imageId)
+                .maxScore(maxScore)
+                .build();
+    }
+
+    public BizQuestion toBiz(List<BizOption> options) {
+        return BizQuestion.builder()
+                .id(id)
+                .type(type)
+                .answerType(answerType)
+                .questionText(questionText)
+                .imageId(imageId)
+                .maxScore(maxScore)
+                .options(options)
+                .build();
     }
 
 }

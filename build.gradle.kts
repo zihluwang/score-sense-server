@@ -36,7 +36,10 @@ dependencies {
     val mybatisFlexVersion: String by project
     val devkitVersion: String by project
     val auth0JwtVersion: String by project
+    val poiVersion: String by project
 
+    implementation("org.apache.poi:poi:$poiVersion")
+    implementation("org.apache.poi:poi-ooxml:$poiVersion")
     implementation("com.onixbyte:devkit-utils:$devkitVersion")
     implementation("com.onixbyte:guid:$devkitVersion")
     implementation("com.auth0:java-jwt:$auth0JwtVersion")

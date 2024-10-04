@@ -1,8 +1,12 @@
 package com.ahgtgk.scoresense.service;
 
 import com.ahgtgk.scoresense.entity.Exam;
+import com.ahgtgk.scoresense.entity.Question;
+import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.enumeration.Status;
 import com.ahgtgk.scoresense.exception.DataConflictException;
+import com.ahgtgk.scoresense.model.biz.BizOption;
+import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
 import com.ahgtgk.scoresense.model.request.CreateExamRequest;
 import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
@@ -10,13 +14,14 @@ import com.ahgtgk.scoresense.repository.ExamRepository;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.onixbyte.guid.GuidCreator;
+import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -143,5 +148,87 @@ public class ExamService {
     public void deleteExam(Long examId) {
         examVacancyService.deleteByExamId(examId);
         examRepository.deleteById(examId);
+    }
+
+    /**
+     * 解析包含题目的 Excel 文件。
+     *
+     * @param workbook Excel 工作簿
+     * @return 解析出来的题目
+     */
+    public List<BizQuestion> resolveQuestions(Workbook workbook) {
+        // 获取默认 Sheet
+        var sheet = workbook.getSheetAt(0);
+
+        var questionId = 1L;
+
+        var questions = new ArrayList<BizQuestion>();
+        // 遍历每一行
+        for (var row : sheet) {
+            // 跳过前两行
+            if (row.getRowNum() < 2) {
+                continue;
+            }
+
+            var questionBuilder = BizQuestion.builder();
+            questionBuilder.id(questionId++);
+
+            // 解析题目题干
+            questionBuilder.questionText(row.getCell(0).getStringCellValue());
+
+            // 解析正确选项
+            var correctOptions = Arrays.stream(row.getCell(5).getStringCellValue().split(",")).toList();
+
+            // 解析选项 A
+            var optionAlpha = BizOption.builder()
+                    .id("A")
+                    .optionText(row.getCell(1).getStringCellValue())
+                    .correct(correctOptions.contains("A"))
+                    .build();
+            // 解析选项 B
+            var optionBravo = BizOption.builder()
+                    .id("B")
+                    .optionText(row.getCell(2).getStringCellValue())
+                    .correct(correctOptions.contains("B"))
+                    .build();
+            // 解析选项 C
+            var optionCharlie = BizOption.builder()
+                    .id("C")
+                    .optionText(row.getCell(3).getStringCellValue())
+                    .correct(correctOptions.contains("C"))
+                    .build();
+            // 解析选项 D
+            var optionDelta = BizOption.builder()
+                    .id("D")
+                    .optionText(row.getCell(4).getStringCellValue())
+                    .correct(correctOptions.contains("D"))
+                    .build();
+            // 添加选项
+            questionBuilder.options(List.of(optionAlpha, optionBravo, optionCharlie, optionDelta));
+
+            // 设置答题类型
+            questionBuilder.answerType(correctOptions.size() == 1 ?
+                    AnswerType.SINGLE_CHOICE : AnswerType.MULTIPLE_CHOICE);
+
+            // 设置题型
+            questionBuilder.type(Double.valueOf(row.getCell(6).getNumericCellValue()).intValue());
+
+            // 设置题目满分
+            questionBuilder.maxScore(Double.valueOf(row.getCell(7).getNumericCellValue() * 100).intValue());
+
+            questions.add(questionBuilder.build());
+        }
+
+        return questions;
+    }
+
+    /**
+     * 根据考试名称获取考试。
+     *
+     * @param name 考试名称
+     * @return 考试信息
+     */
+    public Exam getExamByName(String name) {
+        return examRepository.selectOneByCondition(Exam.EXAM.NAME.eq(name));
     }
 }

@@ -99,7 +99,7 @@ public class VacancyService {
         vacancyRepository.insert(vacancy);
 
         // 绑定考试
-        if (!request.examIds().isEmpty()) {
+        if (Objects.nonNull(request.examIds()) && !request.examIds().isEmpty()) {
             examVacancyService.bindExamsToVacancy(vacancy.getId(), request.examIds());
         }
 
@@ -144,7 +144,7 @@ public class VacancyService {
         vacancyRepository.update(vacancy);
 
         // 绑定岗位与考试信息
-        if (!request.examIds().isEmpty()) {
+        if (Objects.nonNull(request.examIds()) && !request.examIds().isEmpty()) {
             examVacancyService.bindExamsToVacancy(vacancy.getId(), request.examIds());
         }
 

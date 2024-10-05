@@ -87,7 +87,7 @@ public class SwipeController {
      */
     @DeleteMapping("/{swipeId:\\d+}")
     public ResponseEntity<Void> deleteSwipe(@PathVariable Long swipeId) {
-        swipeService.getSwipe(swipeId);
+        swipeService.deleteSwipe(swipeId);
         return ResponseEntity.noContent().build();
     }
 

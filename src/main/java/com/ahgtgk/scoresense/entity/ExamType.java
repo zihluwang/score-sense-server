@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.view.ExamTypeView;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -22,6 +23,13 @@ public class ExamType {
     private String name;
 
     public static final ExamTypeTableDef EXAM_TYPE = new ExamTypeTableDef();
+
+    public ExamTypeView toView() {
+        return ExamTypeView.builder()
+                .id(String.valueOf(id))
+                .name(name)
+                .build();
+    }
 
     public static class ExamTypeTableDef extends TableDef {
 

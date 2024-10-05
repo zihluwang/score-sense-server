@@ -6,10 +6,12 @@ import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
 import com.ahgtgk.scoresense.model.request.CreateExamRequest;
+import com.ahgtgk.scoresense.model.request.CreateExamTypeRequest;
 import com.ahgtgk.scoresense.model.request.ImportExamRequest;
 import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
 import com.ahgtgk.scoresense.service.ExamService;
 import com.ahgtgk.scoresense.service.QuestionService;
+import com.ahgtgk.scoresense.view.ExamTypeView;
 import com.ahgtgk.scoresense.view.ExamView;
 import com.ahgtgk.scoresense.view.FullExamView;
 import com.mybatisflex.core.paginate.Page;
@@ -125,6 +127,11 @@ public class ExamController {
                 .status(exam.getStatus().getCode())
                 .questions(questions.stream().map(BizQuestion::toView).toList())
                 .build();
+    }
+
+    @PostMapping("/types")
+    public ExamTypeView createExamType(@RequestBody CreateExamTypeRequest request) {
+        return examService.createExamType(request).toView();
     }
 
 }

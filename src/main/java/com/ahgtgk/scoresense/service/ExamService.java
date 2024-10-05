@@ -1,7 +1,7 @@
 package com.ahgtgk.scoresense.service;
 
 import com.ahgtgk.scoresense.entity.Exam;
-import com.ahgtgk.scoresense.entity.Question;
+import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.enumeration.Status;
 import com.ahgtgk.scoresense.exception.DataConflictException;
@@ -9,12 +9,13 @@ import com.ahgtgk.scoresense.model.biz.BizOption;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
 import com.ahgtgk.scoresense.model.request.CreateExamRequest;
+import com.ahgtgk.scoresense.model.request.CreateExamTypeRequest;
 import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
 import com.ahgtgk.scoresense.repository.ExamRepository;
+import com.ahgtgk.scoresense.repository.ExamTypeRepository;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.onixbyte.guid.GuidCreator;
-import jakarta.validation.constraints.NotBlank;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +31,19 @@ public class ExamService {
     private final ExamRepository examRepository;
     private final GuidCreator<Long> examIdCreator;
     private final ExamVacancyService examVacancyService;
+    private final SequenceService sequenceService;
+    private final ExamTypeRepository examTypeRepository;
 
     @Autowired
-    public ExamService(ExamRepository examRepository, GuidCreator<Long> examIdCreator, ExamVacancyService examVacancyService) {
+    public ExamService(ExamRepository examRepository, GuidCreator<Long> examIdCreator, ExamVacancyService examVacancyService, SequenceService sequenceService, ExamTypeRepository examTypeRepository) {
         this.examRepository = examRepository;
         this.examIdCreator = examIdCreator;
         this.examVacancyService = examVacancyService;
+        this.sequenceService = sequenceService;
+        this.examTypeRepository = examTypeRepository;
     }
+
+    private final static String SEQ_KEY = "exam_type";
 
     /**
      * 分页查找考试。
@@ -223,12 +230,24 @@ public class ExamService {
     }
 
     /**
-     * 根据考试名称获取考试。
+     * 创建考试类型。
      *
-     * @param name 考试名称
-     * @return 考试信息
+     * @param request 创建考试类型请求
      */
-    public Exam getExamByName(String name) {
-        return examRepository.selectOneByCondition(Exam.EXAM.NAME.eq(name));
+    public ExamType createExamType(CreateExamTypeRequest request) {
+        // 判断考试类型是否可以创建
+        var canCreate = examTypeRepository.selectCountByCondition(ExamType.EXAM_TYPE.NAME.eq(request.name())) == 0;
+        if (!canCreate) {
+            throw new DataConflictException("考试类型名称");
+        }
+
+        // 构建考试类型
+        var examType = ExamType.builder()
+                .id(sequenceService.next(SEQ_KEY).intValue())
+                .name(request.name())
+                .build();
+
+        examTypeRepository.insert(examType);
+        return examType;
     }
 }

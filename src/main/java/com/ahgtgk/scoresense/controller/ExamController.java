@@ -2,6 +2,7 @@ package com.ahgtgk.scoresense.controller;
 
 
 import com.ahgtgk.scoresense.entity.Exam;
+import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
@@ -23,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -132,6 +134,13 @@ public class ExamController {
     @PostMapping("/types")
     public ExamTypeView createExamType(@RequestBody CreateExamTypeRequest request) {
         return examService.createExamType(request).toView();
+    }
+
+    @GetMapping("/types")
+    public Page<ExamTypeView> getExamTypes(@RequestParam(defaultValue = "1") Integer currentPage,
+                                           @RequestParam(defaultValue = "10") Integer pageSize,
+                                           @RequestParam(required = false) String name) {
+        return examService.getExamTypes(currentPage, pageSize, name).map(ExamType::toView);
     }
 
 }

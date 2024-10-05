@@ -13,6 +13,7 @@ import com.ahgtgk.scoresense.model.request.CreateExamTypeRequest;
 import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
 import com.ahgtgk.scoresense.repository.ExamRepository;
 import com.ahgtgk.scoresense.repository.ExamTypeRepository;
+import com.ahgtgk.scoresense.view.ExamTypeView;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.onixbyte.guid.GuidCreator;
@@ -249,5 +250,22 @@ public class ExamService {
 
         examTypeRepository.insert(examType);
         return examType;
+    }
+
+    /**
+     * 分页获取考试类型数据。
+     *
+     * @param currentPage 当前页码
+     * @param pageSize    页面大小
+     * @param name        考试名称
+     */
+    public Page<ExamType> getExamTypes(Integer currentPage, Integer pageSize, String name) {
+        var queryWrapper = QueryWrapper.create();
+        if (Objects.nonNull(name) && !name.isBlank()) {
+            queryWrapper.and(ExamType.EXAM_TYPE.NAME.like(name));
+        }
+        queryWrapper.orderBy(ExamType.EXAM_TYPE.ID, true);
+
+        return examTypeRepository.paginate(currentPage, pageSize, queryWrapper);
     }
 }

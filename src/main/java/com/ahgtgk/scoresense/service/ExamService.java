@@ -4,6 +4,7 @@ import com.ahgtgk.scoresense.entity.Exam;
 import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.enumeration.Status;
+import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.exception.DataConflictException;
 import com.ahgtgk.scoresense.model.biz.BizOption;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
@@ -14,8 +15,6 @@ import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
 import com.ahgtgk.scoresense.model.request.UpdateExamTypeRequest;
 import com.ahgtgk.scoresense.repository.ExamRepository;
 import com.ahgtgk.scoresense.repository.ExamTypeRepository;
-import com.ahgtgk.scoresense.view.ExamTypeView;
-import com.ahgtgk.scoresense.view.ExamView;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.util.UpdateEntity;
@@ -23,6 +22,7 @@ import com.onixbyte.guid.GuidCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -298,5 +298,19 @@ public class ExamService {
 
         examTypeRepository.update(examType);
         return examType;
+    }
+
+    /**
+     * 删除考试类型。
+     *
+     * @param examTypeId 考试类型 ID
+     */
+    public void deleteExamType(Integer examTypeId) {
+        var canDelete = examRepository.selectCountByCondition(Exam.EXAM.TYPE.eq(examTypeId)) == 0;
+        if (!canDelete) {
+            throw new BizException(HttpStatus.UNPROCESSABLE_ENTITY, "该考试类型仍有绑定的考试");
+        }
+
+        examTypeRepository.deleteById(examTypeId);
     }
 }

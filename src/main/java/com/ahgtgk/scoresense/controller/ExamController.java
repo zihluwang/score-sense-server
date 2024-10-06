@@ -1,6 +1,5 @@
 package com.ahgtgk.scoresense.controller;
 
-
 import com.ahgtgk.scoresense.entity.Exam;
 import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.exception.BizException;
@@ -21,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -153,6 +151,12 @@ public class ExamController {
     public ExamTypeView updateExamType(@Valid @RequestBody UpdateExamTypeRequest request) {
         return examService.updateExamType(request)
                 .toView();
+    }
+
+    @DeleteMapping("/types/{examTypeId:\\d+}")
+    public ResponseEntity<Void> deleteExamType(@PathVariable Integer examTypeId) {
+        examService.deleteExamType(examTypeId);
+        return ResponseEntity.noContent().build();
     }
 
 }

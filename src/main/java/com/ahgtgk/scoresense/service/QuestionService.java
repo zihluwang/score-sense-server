@@ -140,15 +140,23 @@ public class QuestionService {
         var deleteOptionTask = CompletableFuture.runAsync(
                 () -> optionRepository.deleteByCondition(Option.OPTION.EXAM_ID.eq(examId)
                         .and(Option.OPTION.QUESTION_ID.eq(questionId))),
-                ConcurrentConfig.CACHED_EXECUTORS);
+                ConcurrentConfig.CACHED_EXECUTORS
+        );
 
         // 删除题目
         var deleteQuestionTask = CompletableFuture.runAsync(
                 () -> questionRepository.deleteByCondition(Question.QUESTION.EXAM_ID.eq(examId)
                         .and(Question.QUESTION.ID.eq(questionId))),
-                ConcurrentConfig.CACHED_EXECUTORS);
+                ConcurrentConfig.CACHED_EXECUTORS
+        );
 
-        CompletableFuture.allOf(deleteOptionTask, deleteQuestionTask).join();
+        // 删除题解
+        var deleteSolutionTask = CompletableFuture.runAsync(
+                () -> solutionRepository.deleteSolution(examId, questionId),
+                ConcurrentConfig.CACHED_EXECUTORS
+        );
+
+        CompletableFuture.allOf(deleteOptionTask, deleteQuestionTask, deleteSolutionTask).join();
     }
 
     /**

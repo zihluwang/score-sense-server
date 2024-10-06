@@ -17,6 +17,7 @@ public record UpdateQuestionRequest(
         String questionText,
         Long imageId,
         Integer maxScore,
-        List<OptionRequest> options
+        List<OptionRequest> options,
+        String solution
 ) {
 }

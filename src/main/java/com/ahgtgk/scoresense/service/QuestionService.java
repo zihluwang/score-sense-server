@@ -196,6 +196,16 @@ public class QuestionService {
                     ConcurrentConfig.CACHED_EXECUTORS
             ).join();
         }
+
+        if (Objects.nonNull(request.solution()) && !request.solution().isBlank()) {
+            var _solution = Solution.builder()
+                    .examId(request.examId())
+                    .questionId(request.id())
+                    .solutionText(request.solution())
+                    .build();
+
+            solutionRepository.update(_solution);
+        }
     }
 
     /**

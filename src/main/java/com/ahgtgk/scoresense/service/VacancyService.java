@@ -1,5 +1,7 @@
 package com.ahgtgk.scoresense.service;
 
+import com.ahgtgk.scoresense.entity.Prefecture;
+import com.ahgtgk.scoresense.entity.Province;
 import com.ahgtgk.scoresense.entity.Vacancy;
 import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.criteria.SearchVacancyCriteria;
@@ -10,11 +12,15 @@ import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.onixbyte.guid.GuidCreator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -25,13 +31,16 @@ public class VacancyService {
     private final VacancyRepository vacancyRepository;
     private final GuidCreator<Long> vacancyIdCreator;
     private final ExamVacancyService examVacancyService;
+    private final DivisionService divisionService;
 
     public VacancyService(VacancyRepository vacancyRepository,
                           @Qualifier("vacancyIdCreator") GuidCreator<Long> vacancyIdCreator,
-                          ExamVacancyService examVacancyService) {
+                          ExamVacancyService examVacancyService,
+                          DivisionService divisionService) {
         this.vacancyRepository = vacancyRepository;
         this.vacancyIdCreator = vacancyIdCreator;
         this.examVacancyService = examVacancyService;
+        this.divisionService = divisionService;
     }
 
     /**
@@ -164,4 +173,44 @@ public class VacancyService {
         vacancyRepository.deleteById(vacancyId);
     }
 
+    /**
+     * 从 Excel 导入岗位信息。
+     *
+     * @param workbook 包含岗位信息的 Excel Workbook
+     */
+    public void importVacancies(Workbook workbook) {
+        var sheet = workbook.getSheetAt(0);
+
+        var provinces = divisionService.getAllProvinces();
+        var prefectures = divisionService.getAllPrefectures();
+
+        var vacancies = new ArrayList<Vacancy>();
+        for (var row : sheet) {
+            if (row.getRowNum() == 0) {
+                continue;
+            }
+
+            var provinceName = row.getCell(2).getStringCellValue();
+            var prefectureName = row.getCell(3).getStringCellValue();
+
+            var vacancy = Vacancy
+                    .builder()
+                    .id(Long.parseLong(row.getCell(0).getStringCellValue()))
+                    .name(row.getCell(1).getStringCellValue())
+                    .province(provinces.stream()
+                            .filter((province) -> province.getName().equals(provinceName))
+                            .findFirst()
+                            .map(Province::getCode)
+                            .orElseThrow(() -> new BizException(HttpStatus.BAD_REQUEST, "省份名称不正确")))
+                    .prefecture(prefectures.stream()
+                            .filter((prefecture) -> prefecture.getName().equals(prefectureName))
+                            .findFirst()
+                            .map(Prefecture::getCode)
+                            .orElseThrow(() -> new BizException(HttpStatus.BAD_REQUEST, "地市名称不正确")))
+                    .build();
+            vacancies.add(vacancy);
+        }
+
+        vacancyRepository.insertBatch(vacancies);
+    }
 }

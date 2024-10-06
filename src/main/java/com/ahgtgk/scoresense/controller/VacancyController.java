@@ -1,6 +1,7 @@
 package com.ahgtgk.scoresense.controller;
 
 import com.ahgtgk.scoresense.entity.Vacancy;
+import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.criteria.SearchVacancyCriteria;
 import com.ahgtgk.scoresense.model.request.CreateVacancyRequest;
 import com.ahgtgk.scoresense.model.request.UpdateVacancyRequest;
@@ -9,8 +10,13 @@ import com.ahgtgk.scoresense.view.VacancyView;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -78,6 +84,16 @@ public class VacancyController {
     public ResponseEntity<Void> deleteVacancy(@PathVariable Long vacancyId) {
         vacancyService.deleteVacancy(vacancyId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<Void> importVacancies(@RequestParam MultipartFile attachment) {
+        try (var workbook = new XSSFWorkbook(attachment.getInputStream())) {
+            vacancyService.importVacancies(workbook);
+            return ResponseEntity.noContent().build();
+        } catch (IOException e) {
+            throw new BizException(HttpStatus.INTERNAL_SERVER_ERROR, "无法打开文件");
+        }
     }
 
 }

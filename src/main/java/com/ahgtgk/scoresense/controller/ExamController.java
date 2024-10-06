@@ -1,16 +1,16 @@
 package com.ahgtgk.scoresense.controller;
 
+import com.ahgtgk.scoresense.entity.Answer;
 import com.ahgtgk.scoresense.entity.Exam;
 import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
 import com.ahgtgk.scoresense.model.request.*;
+import com.ahgtgk.scoresense.service.AnswerService;
 import com.ahgtgk.scoresense.service.ExamService;
 import com.ahgtgk.scoresense.service.QuestionService;
-import com.ahgtgk.scoresense.view.ExamTypeView;
-import com.ahgtgk.scoresense.view.ExamView;
-import com.ahgtgk.scoresense.view.FullExamView;
+import com.ahgtgk.scoresense.view.*;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -29,10 +30,12 @@ public class ExamController {
 
     private final ExamService examService;
     private final QuestionService questionService;
+    private final AnswerService answerService;
 
-    public ExamController(ExamService examService, QuestionService questionService) {
+    public ExamController(ExamService examService, QuestionService questionService, AnswerService answerService) {
         this.examService = examService;
         this.questionService = questionService;
+        this.answerService = answerService;
     }
 
     @GetMapping("/")
@@ -158,5 +161,7 @@ public class ExamController {
         examService.deleteExamType(examTypeId);
         return ResponseEntity.noContent().build();
     }
+
+
 
 }

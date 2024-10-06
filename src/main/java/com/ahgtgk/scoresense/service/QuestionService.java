@@ -225,4 +225,14 @@ public class QuestionService {
     public String getSolution(Long examId, Long questionId) {
         return solutionRepository.selectSolutionTextById(examId, questionId);
     }
+
+    public BizQuestion getQuestion(Long examId, Long questionId) {
+        var options = optionRepository.selectListByCondition(
+                        Option.OPTION.EXAM_ID.eq(examId).and(Option.OPTION.QUESTION_ID.eq(questionId)))
+                .stream()
+                .map(Option::toBiz)
+                .toList();
+        return questionRepository.selectOneByCondition(Question.QUESTION.EXAM_ID.eq(examId)
+                .and(Question.QUESTION.ID.eq(questionId))).toBiz(options);
+    }
 }

@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.view.AnswerView;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -36,12 +37,6 @@ public class Answer {
     private Long questionId;
 
     /**
-     * 答案 ID。
-     */
-    @Id(keyType = KeyType.None)
-    private Long id;
-
-    /**
      * 答题用户 ID。
      */
     private Long userId;
@@ -69,8 +64,6 @@ public class Answer {
 
         public final QueryColumn QUESTION_ID = new QueryColumn(this, "question_id");
 
-        public final QueryColumn ID = new QueryColumn(this, "id");
-
         public final QueryColumn USER_ID = new QueryColumn(this, "user_id");
 
         public final QueryColumn ANSWER_TEXT = new QueryColumn(this, "answer_text");
@@ -81,7 +74,7 @@ public class Answer {
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, QUESTION_ID, ID, USER_ID, ANSWER_TEXT, SUBMITTED_AT,
+        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, QUESTION_ID, USER_ID, ANSWER_TEXT, SUBMITTED_AT,
                 SCORE};
 
         private AnswerTableDef() {
@@ -96,6 +89,17 @@ public class Answer {
             var key = getNameWithSchema() + "." + alias;
             return getCache(key, (k) -> new AnswerTableDef("", "admin", alias));
         }
+    }
+
+    public AnswerView toView() {
+        return AnswerView.builder()
+                .examId(String.valueOf(examId))
+                .questionId(String.valueOf(questionId))
+                .userId(String.valueOf(userId))
+                .answerText(answerText)
+                .score(score)
+                .submittedAt(submittedAt)
+                .build();
     }
 
 }

@@ -2,7 +2,6 @@ package com.ahgtgk.scoresense.model.biz;
 
 import com.ahgtgk.scoresense.entity.Option;
 import com.ahgtgk.scoresense.entity.Question;
-import com.ahgtgk.scoresense.entity.QuestionType;
 import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.view.QuestionView;
 import lombok.AllArgsConstructor;

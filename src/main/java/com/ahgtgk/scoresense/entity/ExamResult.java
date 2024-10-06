@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.entity;
 
+import com.ahgtgk.scoresense.view.ExamResultView;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -24,24 +25,21 @@ import java.time.LocalDateTime;
 public class ExamResult {
 
     /**
-     * 考试结果 ID。
-     */
-    @Id(keyType = KeyType.None)
-    private Long id;
-
-    /**
      * 此次考试的 ID。
      */
+    @Id(keyType = KeyType.None)
     private Long examId;
 
     /**
      * 参加此次考试的用户 ID。
      */
+    @Id(keyType = KeyType.None)
     private Long userId;
 
     /**
      * 岗位 ID。
      */
+    @Id(keyType = KeyType.None)
     private Long vacancyId;
 
     /**
@@ -58,8 +56,6 @@ public class ExamResult {
 
     public static class ExamResultTableDef extends TableDef {
 
-        public final QueryColumn ID = new QueryColumn(this, "id");
-
         public final QueryColumn EXAM_ID = new QueryColumn(this, "exam_id");
 
         public final QueryColumn USER_ID = new QueryColumn(this, "user_id");
@@ -72,7 +68,7 @@ public class ExamResult {
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, EXAM_ID, USER_ID, VACANCY_ID, TOTAL_SCORE, COMPLETED_AT};
+        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, USER_ID, VACANCY_ID, TOTAL_SCORE, COMPLETED_AT};
 
         private ExamResultTableDef() {
             super("", "exam_result");
@@ -86,6 +82,16 @@ public class ExamResult {
             var key = getNameWithSchema() + "." + alisa;
             return getCache(key, (k) -> new ExamResultTableDef("", "exam_result", alias));
         }
+    }
+
+    public ExamResultView toView() {
+        return ExamResultView.builder()
+                .examId(String.valueOf(examId))
+                .userId(String.valueOf(userId))
+                .vacancyId(String.valueOf(vacancyId))
+                .totalScore(totalScore)
+                .completedAt(completedAt)
+                .build();
     }
 
 }

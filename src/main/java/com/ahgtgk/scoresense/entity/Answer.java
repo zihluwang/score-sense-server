@@ -70,7 +70,7 @@ public class Answer {
 
         public final QueryColumn SUBMITTED_AT = new QueryColumn(this, "submitted_at");
 
-        public final QueryColumn SCORE = new QueryColumn(this, "score");
+        public final QueryColumn SCORE = new QueryColumn(this, "totalScore");
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 

@@ -1,23 +1,20 @@
 package com.ahgtgk.scoresense.service;
 
-import com.ahgtgk.scoresense.domain.UserDomain;
 import com.ahgtgk.scoresense.entity.Answer;
 import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.biz.BizOption;
 import com.ahgtgk.scoresense.model.request.AnswerQuestionRequest;
 import com.ahgtgk.scoresense.repository.AnswerRepository;
-import jakarta.validation.Valid;
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,10 +22,12 @@ public class AnswerService {
 
     private final AnswerRepository answerRepository;
     private final QuestionService questionService;
+    private final UserService userService;
 
-    public AnswerService(AnswerRepository answerRepository, QuestionService questionService) {
+    public AnswerService(AnswerRepository answerRepository, QuestionService questionService, UserService userService) {
         this.answerRepository = answerRepository;
         this.questionService = questionService;
+        this.userService = userService;
     }
 
     /**
@@ -37,7 +36,7 @@ public class AnswerService {
      * @param examId 考试 ID
      */
     public List<Answer> continueAnswer(Long examId) {
-        var currentUser = getCurrentUser();
+        var currentUser = userService.getCurrentUser();
         return answerRepository.selectListByCondition(Answer.ANSWER.EXAM_ID.eq(examId)
                 .and(Answer.ANSWER.USER_ID.eq(currentUser.getId())));
     }
@@ -48,7 +47,7 @@ public class AnswerService {
      * @param request 用户的答案
      */
     public void answerQuestion(AnswerQuestionRequest request) {
-        var currentUser = getCurrentUser();
+        var currentUser = userService.getCurrentUser();
 
         var question = questionService.getQuestion(request.examId(), request.questionId());
         if (AnswerType.SUBJECTIVE == question.getAnswerType()) {
@@ -99,11 +98,37 @@ public class AnswerService {
         answerRepository.insertOrUpdate(answer);
     }
 
-    private UserDomain getCurrentUser() {
-        if (SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDomain currentUser) {
-            return currentUser;
-        }
-        throw new BizException(HttpStatus.UNAUTHORIZED, "无法获取用户身份信息");
+    /**
+     * 获取用户指定考试的答题信息。
+     *
+     * @param examId 考试 ID
+     */
+    public List<Answer> getAnswers(Long examId) {
+        var userId = userService.getCurrentUser().getId();
+        return answerRepository.selectListByQuery(QueryWrapper.create()
+                .where(Answer.ANSWER.EXAM_ID.eq(examId))
+                .and(Answer.ANSWER.USER_ID.eq(userId)));
+    }
+
+    public void fillUnansweredQuestions(Long examId, List<Answer> answers) {
+        var currentUser = userService.getCurrentUser();
+
+        var answeredQuestionIds = answers.stream()
+                .map(Answer::getQuestionId)
+                .collect(Collectors.toSet());
+        var answersForUnansweredQuestions = questionService.getQuestions(examId)
+                .stream()
+                .filter((question) -> !answeredQuestionIds.contains(question.getId()))
+                .map((question) -> Answer.builder()
+                        .examId(examId)
+                        .questionId(question.getId())
+                        .answerText("")
+                        .score(0)
+                        .submittedAt(LocalDateTime.now())
+                        .userId(currentUser.getId())
+                        .build())
+                .toList();
+        answerRepository.insertBatch(answersForUnansweredQuestions);
     }
 
     private boolean areListsEqual(List<String> listA, List<String> listB) {

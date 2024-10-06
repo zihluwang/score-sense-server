@@ -3,6 +3,8 @@ package com.ahgtgk.scoresense.entity;
 import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.model.biz.BizOption;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
+import com.ahgtgk.scoresense.view.OptionView;
+import com.ahgtgk.scoresense.view.QuestionView;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
@@ -121,6 +123,22 @@ public class Question {
                 .maxScore(maxScore)
                 .options(options)
                 .build();
+    }
+
+    public QuestionView toView(List<OptionView> options) {
+        return QuestionView.builder()
+                .id(id)
+                .type(type)
+                .answerType(answerType)
+                .questionText(questionText)
+                .imageId(imageId)
+                .maxScore(maxScore)
+                .options(options)
+                .build();
+    }
+
+    public QuestionView toView() {
+        return toView(null);
     }
 
 }

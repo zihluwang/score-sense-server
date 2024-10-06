@@ -13,6 +13,7 @@ import com.ahgtgk.scoresense.repository.QuestionRepository;
 import com.ahgtgk.scoresense.repository.SolutionRepository;
 import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,15 +30,13 @@ public class QuestionService {
     private final OptionRepository optionRepository;
     private final SolutionRepository solutionRepository;
 
-    public QuestionService(QuestionRepository questionRepository, OptionRepository optionRepository, SolutionRepository solutionRepository) {
+    @Autowired
+    public QuestionService(QuestionRepository questionRepository,
+                           OptionRepository optionRepository,
+                           SolutionRepository solutionRepository) {
         this.questionRepository = questionRepository;
         this.optionRepository = optionRepository;
         this.solutionRepository = solutionRepository;
-    }
-
-    public Question createQuestion(Question question) {
-        questionRepository.insert(question);
-        return question;
     }
 
     @Transactional
@@ -55,7 +54,8 @@ public class QuestionService {
 
         var bizQuestion = question.toBiz();
 
-        if (List.of(AnswerType.SINGLE_CHOICE, AnswerType.MULTIPLE_CHOICE).contains(request.answerType()) && !request.options().isEmpty()) {
+        if (List.of(AnswerType.SINGLE_CHOICE, AnswerType.MULTIPLE_CHOICE).contains(request.answerType()) &&
+                !request.options().isEmpty()) {
             var options = request.options()
                     .stream()
                     .map((createOptionRequest) -> Option.builder()

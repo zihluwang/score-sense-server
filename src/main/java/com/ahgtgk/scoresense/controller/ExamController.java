@@ -6,10 +6,7 @@ import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
-import com.ahgtgk.scoresense.model.request.CreateExamRequest;
-import com.ahgtgk.scoresense.model.request.CreateExamTypeRequest;
-import com.ahgtgk.scoresense.model.request.ImportExamRequest;
-import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
+import com.ahgtgk.scoresense.model.request.*;
 import com.ahgtgk.scoresense.service.ExamService;
 import com.ahgtgk.scoresense.service.QuestionService;
 import com.ahgtgk.scoresense.view.ExamTypeView;
@@ -150,6 +147,12 @@ public class ExamController {
                                              @PathVariable Long examTypeId) {
         return examService.getExamsByExamType(currentPage, pageSize, examTypeId)
                 .map(Exam::toView);
+    }
+
+    @PatchMapping("/types")
+    public ExamTypeView updateExamType(@Valid @RequestBody UpdateExamTypeRequest request) {
+        return examService.updateExamType(request)
+                .toView();
     }
 
 }

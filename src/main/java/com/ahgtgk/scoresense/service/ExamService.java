@@ -11,12 +11,14 @@ import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
 import com.ahgtgk.scoresense.model.request.CreateExamRequest;
 import com.ahgtgk.scoresense.model.request.CreateExamTypeRequest;
 import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
+import com.ahgtgk.scoresense.model.request.UpdateExamTypeRequest;
 import com.ahgtgk.scoresense.repository.ExamRepository;
 import com.ahgtgk.scoresense.repository.ExamTypeRepository;
 import com.ahgtgk.scoresense.view.ExamTypeView;
 import com.ahgtgk.scoresense.view.ExamView;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
+import com.mybatisflex.core.util.UpdateEntity;
 import com.onixbyte.guid.GuidCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -274,12 +276,27 @@ public class ExamService {
      * 根据考试类型分页查询考试信息。
      *
      * @param currentPage 当前页面
-     * @param pageSize 页面大小
-     * @param examTypeId 考试类型 ID
+     * @param pageSize    页面大小
+     * @param examTypeId  考试类型 ID
      */
     public Page<Exam> getExamsByExamType(Integer currentPage, Integer pageSize, Long examTypeId) {
         return examRepository.paginate(currentPage, pageSize, QueryWrapper.create()
                 .where(Exam.EXAM.TYPE.eq(examTypeId))
                 .orderBy(Exam.EXAM.ID, false));
+    }
+
+    /**
+     * 更新考试类型。
+     *
+     * @param request 更新考试类型请求
+     */
+    public ExamType updateExamType(UpdateExamTypeRequest request) {
+        var examType = UpdateEntity.of(ExamType.class, request.id());
+        if (Objects.nonNull(request.name()) && !request.name().isBlank()) {
+            examType.setName(request.name());
+        }
+
+        examTypeRepository.update(examType);
+        return examType;
     }
 }

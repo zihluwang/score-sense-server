@@ -14,6 +14,7 @@ import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
 import com.ahgtgk.scoresense.repository.ExamRepository;
 import com.ahgtgk.scoresense.repository.ExamTypeRepository;
 import com.ahgtgk.scoresense.view.ExamTypeView;
+import com.ahgtgk.scoresense.view.ExamView;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.onixbyte.guid.GuidCreator;
@@ -267,5 +268,18 @@ public class ExamService {
         queryWrapper.orderBy(ExamType.EXAM_TYPE.ID, true);
 
         return examTypeRepository.paginate(currentPage, pageSize, queryWrapper);
+    }
+
+    /**
+     * 根据考试类型分页查询考试信息。
+     *
+     * @param currentPage 当前页面
+     * @param pageSize 页面大小
+     * @param examTypeId 考试类型 ID
+     */
+    public Page<Exam> getExamsByExamType(Integer currentPage, Integer pageSize, Long examTypeId) {
+        return examRepository.paginate(currentPage, pageSize, QueryWrapper.create()
+                .where(Exam.EXAM.TYPE.eq(examTypeId))
+                .orderBy(Exam.EXAM.ID, false));
     }
 }

@@ -140,7 +140,16 @@ public class ExamController {
     public Page<ExamTypeView> getExamTypes(@RequestParam(defaultValue = "1") Integer currentPage,
                                            @RequestParam(defaultValue = "10") Integer pageSize,
                                            @RequestParam(required = false) String name) {
-        return examService.getExamTypes(currentPage, pageSize, name).map(ExamType::toView);
+        return examService.getExamTypes(currentPage, pageSize, name)
+                .map(ExamType::toView);
+    }
+
+    @GetMapping("/types/{examTypeId:\\d+}")
+    public Page<ExamView> getExamsByExamType(@RequestParam(defaultValue = "1") Integer currentPage,
+                                             @RequestParam(defaultValue = "10") Integer pageSize,
+                                             @PathVariable Long examTypeId) {
+        return examService.getExamsByExamType(currentPage, pageSize, examTypeId)
+                .map(Exam::toView);
     }
 
 }

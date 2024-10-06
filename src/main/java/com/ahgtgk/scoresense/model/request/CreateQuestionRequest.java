@@ -20,6 +20,7 @@ public record CreateQuestionRequest(
         Long imageId,
         @NotNull(message = "最大分数不能为空")
         Integer maxScore,
-        List<OptionRequest> options
+        List<OptionRequest> options,
+        String solution
 ) {
 }

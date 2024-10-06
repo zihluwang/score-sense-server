@@ -227,6 +227,16 @@ public class ExamService {
             // 设置题目满分
             questionBuilder.maxScore(Double.valueOf(row.getCell(7).getNumericCellValue() * 100).intValue());
 
+            // 设置解析
+            var _solution = Optional.ofNullable(row.getCell(8))
+                    .map((cell) -> switch (cell.getCellType()) {
+                        case _NONE, BLANK, BOOLEAN, ERROR, FORMULA -> "略";
+                        case NUMERIC -> String.valueOf(cell.getNumericCellValue());
+                        case STRING -> cell.getStringCellValue();
+                    })
+                    .orElse("略");
+            questionBuilder.solution(_solution);
+
             questions.add(questionBuilder.build());
         }
 

@@ -32,6 +32,8 @@ public class BizQuestion {
 
     private List<BizOption> options;
 
+    private String solution;
+
     public QuestionView toView() {
         return QuestionView.builder()
                 .id(id)
@@ -41,6 +43,7 @@ public class BizQuestion {
                 .imageId(imageId)
                 .maxScore(maxScore)
                 .options(options.stream().map(BizOption::toView).toList())
+                .solution(solution)
                 .build();
     }
 

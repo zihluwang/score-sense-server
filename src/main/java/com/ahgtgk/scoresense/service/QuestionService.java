@@ -3,20 +3,19 @@ package com.ahgtgk.scoresense.service;
 import com.ahgtgk.scoresense.config.ConcurrentConfig;
 import com.ahgtgk.scoresense.entity.Option;
 import com.ahgtgk.scoresense.entity.Question;
+import com.ahgtgk.scoresense.entity.Solution;
 import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.request.CreateQuestionRequest;
 import com.ahgtgk.scoresense.model.request.UpdateQuestionRequest;
 import com.ahgtgk.scoresense.repository.OptionRepository;
 import com.ahgtgk.scoresense.repository.QuestionRepository;
+import com.ahgtgk.scoresense.repository.SolutionRepository;
 import com.mybatisflex.core.query.QueryWrapper;
-import com.mybatisflex.core.util.UpdateEntity;
-import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,10 +27,12 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
     private final OptionRepository optionRepository;
+    private final SolutionRepository solutionRepository;
 
-    public QuestionService(QuestionRepository questionRepository, OptionRepository optionRepository) {
+    public QuestionService(QuestionRepository questionRepository, OptionRepository optionRepository, SolutionRepository solutionRepository) {
         this.questionRepository = questionRepository;
         this.optionRepository = optionRepository;
+        this.solutionRepository = solutionRepository;
     }
 
     public Question createQuestion(Question question) {
@@ -75,7 +76,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public int createQuestions(Long examId, List<BizQuestion> bizQuestions) {
+    public void createQuestions(Long examId, List<BizQuestion> bizQuestions) {
         var saveOptionTask = CompletableFuture.runAsync(() -> {
             var options = bizQuestions.stream()
                     .flatMap((question) -> question.getPersistentOptions(examId, question.getId()).stream())
@@ -92,8 +93,21 @@ public class QuestionService {
             return questionRepository.insertQuestions(questions);
         }, ConcurrentConfig.CACHED_EXECUTORS);
 
-        CompletableFuture.allOf(saveOptionTask, saveQuestionTask).join();
-        return saveQuestionTask.join();
+        var saveSolutionsTask = CompletableFuture.runAsync(() -> {
+            var solutions = bizQuestions.stream().map((question) -> Solution.builder()
+                            .examId(examId)
+                            .questionId(question.getId())
+                            .solutionText(question.getSolution())
+                            .build())
+                    .toList();
+            solutionRepository.insertBatch(solutions);
+        }, ConcurrentConfig.CACHED_EXECUTORS);
+
+        CompletableFuture.allOf(
+                saveOptionTask,
+                saveQuestionTask,
+                saveSolutionsTask
+        ).join();
     }
 
     public List<BizQuestion> getQuestions(Long examId) {
@@ -182,5 +196,15 @@ public class QuestionService {
                     ConcurrentConfig.CACHED_EXECUTORS
             ).join();
         }
+    }
+
+    /**
+     * 根据考试 ID 及题目 ID 查询题目解析。
+     *
+     * @param examId     考试 ID
+     * @param questionId 题目 ID
+     */
+    public String getSolution(Long examId, Long questionId) {
+        return solutionRepository.selectSolutionTextById(examId, questionId);
     }
 }

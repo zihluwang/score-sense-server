@@ -13,6 +13,7 @@ public record QuestionView(
         String questionText,
         Long imageId,
         Integer maxScore,
-        List<OptionView> options
+        List<OptionView> options,
+        String solution
 ) {
 }

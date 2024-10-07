@@ -6,11 +6,13 @@ import com.ahgtgk.scoresense.entity.ExamResult;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.repository.ExamResultRepository;
 import com.ahgtgk.scoresense.view.ReportView;
+import com.ahgtgk.scoresense.view.ScoreAnalysisView;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.onixbyte.devkit.utils.ChainedCalcUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -192,6 +194,14 @@ public class ExamResultService {
      */
     public Integer getLowerCount(Long examId, Long userId) {
         return examResultRepository.selectLowerCount(examId, userId);
+    }
+
+    /**
+     * 获取成绩分段分析报告。
+     */
+    public List<ScoreAnalysisView> getScoreAnalysis(Long examId) {
+        var userId = userService.getCurrentUser().getId();
+        return examResultRepository.selectScoreAnalysis(examId, userId);
     }
 
 }

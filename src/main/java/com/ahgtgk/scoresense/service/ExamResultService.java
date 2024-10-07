@@ -3,6 +3,7 @@ package com.ahgtgk.scoresense.service;
 import com.ahgtgk.scoresense.config.ConcurrentConfig;
 import com.ahgtgk.scoresense.entity.Answer;
 import com.ahgtgk.scoresense.entity.ExamResult;
+import com.ahgtgk.scoresense.entity.User;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.repository.ExamResultRepository;
 import com.ahgtgk.scoresense.view.ReportView;
@@ -202,6 +203,14 @@ public class ExamResultService {
     public List<ScoreAnalysisView> getScoreAnalysis(Long examId) {
         var userId = userService.getCurrentUser().getId();
         return examResultRepository.selectScoreAnalysis(examId, userId);
+    }
+
+    /**
+     * 查询排名前 15 的用户列表。
+     */
+    public List<User> getTop15Users(Long examId) {
+        var userId = userService.getCurrentUser().getId();
+        return examResultRepository.selectTop15Users(examId, userId);
     }
 
 }

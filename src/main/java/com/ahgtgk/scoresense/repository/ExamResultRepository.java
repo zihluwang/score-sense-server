@@ -1,6 +1,7 @@
 package com.ahgtgk.scoresense.repository;
 
 import com.ahgtgk.scoresense.entity.ExamResult;
+import com.ahgtgk.scoresense.entity.User;
 import com.ahgtgk.scoresense.view.ScoreAnalysisView;
 import com.mybatisflex.core.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -114,4 +115,33 @@ public interface ExamResultRepository extends BaseMapper<ExamResult> {
             ORDER BY score_range;
             """)
     List<ScoreAnalysisView> selectScoreAnalysis(@Param("examId") Long examId, @Param("userId") Long userId);
+
+    @Select("""
+            WITH user_vacancy AS (
+                SELECT vacancy_id
+                FROM public.exam_result
+                WHERE exam_id = #{examId}
+                  AND user_id = #{userId}
+            ),
+            ranked_users AS (
+                SELECT er.user_id,
+                       er.score,
+                       RANK() OVER (ORDER BY er.score DESC) AS rank
+                FROM public.exam_result er
+                WHERE er.exam_id = #{examId}
+                  AND er.vacancy_id = (SELECT vacancy_id FROM user_vacancy)
+            )
+            SELECT u.id,
+                   u.open_id,
+                   u.username,
+                   u.phone_number,
+                   u.avatar_id,
+                   ru.rank
+            FROM ranked_users ru
+            JOIN public."user" u ON ru.user_id = u.id
+            WHERE ru.rank <= 15
+            ORDER BY ru.rank;
+            """)
+    List<User> selectTop15Users(@Param("examId") Long examId, @Param("userId") Long userId);
+
 }

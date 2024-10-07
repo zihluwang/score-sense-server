@@ -1,11 +1,13 @@
 package com.ahgtgk.scoresense.controller;
 
 import com.ahgtgk.scoresense.entity.Answer;
+import com.ahgtgk.scoresense.entity.User;
 import com.ahgtgk.scoresense.service.AnswerService;
 import com.ahgtgk.scoresense.service.ExamResultService;
 import com.ahgtgk.scoresense.view.AnswerView;
 import com.ahgtgk.scoresense.view.ReportView;
 import com.ahgtgk.scoresense.view.ScoreAnalysisView;
+import com.ahgtgk.scoresense.view.UserView;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,6 +44,14 @@ public class ExamResultController {
         return answerService.getAnswers(examId)
                 .stream()
                 .map(Answer::toView)
+                .toList();
+    }
+
+    @GetMapping("/{examId:\\d+}/top-15")
+    public List<UserView> getTop15Users(@PathVariable Long examId) {
+        return examResultService.getTop15Users(examId)
+                .stream()
+                .map(User::toView)
                 .toList();
     }
 

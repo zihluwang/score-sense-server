@@ -1,6 +1,9 @@
 package com.ahgtgk.scoresense.controller;
 
+import com.ahgtgk.scoresense.entity.Answer;
+import com.ahgtgk.scoresense.service.AnswerService;
 import com.ahgtgk.scoresense.service.ExamResultService;
+import com.ahgtgk.scoresense.view.AnswerView;
 import com.ahgtgk.scoresense.view.ReportView;
 import com.ahgtgk.scoresense.view.ScoreAnalysisView;
 import lombok.extern.slf4j.Slf4j;
@@ -17,9 +20,11 @@ import java.util.List;
 public class ExamResultController {
 
     private final ExamResultService examResultService;
+    private final AnswerService answerService;
 
-    public ExamResultController(ExamResultService examResultService) {
+    public ExamResultController(ExamResultService examResultService, AnswerService answerService) {
         this.examResultService = examResultService;
+        this.answerService = answerService;
     }
 
     @GetMapping("/report/{examId:\\d+}")
@@ -30,6 +35,14 @@ public class ExamResultController {
     @GetMapping("/score-analysis/{examId:\\d+}")
     public List<ScoreAnalysisView> getScoreAnalysis(@PathVariable Long examId) {
         return examResultService.getScoreAnalysis(examId);
+    }
+
+    @GetMapping("/answer-analysis/{examId:\\d+}")
+    public List<AnswerView> getAnswers(@PathVariable Long examId) {
+        return answerService.getAnswers(examId)
+                .stream()
+                .map(Answer::toView)
+                .toList();
     }
 
 }

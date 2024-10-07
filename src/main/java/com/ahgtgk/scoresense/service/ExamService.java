@@ -290,9 +290,13 @@ public class ExamService {
      * @param examTypeId  考试类型 ID
      */
     public Page<Exam> getExamsByExamType(Integer currentPage, Integer pageSize, Long examTypeId) {
-        return examRepository.paginate(currentPage, pageSize, QueryWrapper.create()
-                .where(Exam.EXAM.TYPE.eq(examTypeId))
-                .orderBy(Exam.EXAM.ID, false));
+        var queryWrapper = QueryWrapper.create();
+        if (examTypeId != 0) {
+            queryWrapper.where(Exam.EXAM.TYPE.eq(examTypeId));
+        }
+        queryWrapper.and(Exam.EXAM.STATUS.eq(Status.ENABLED));
+        queryWrapper.orderBy(Exam.EXAM.ID, false);
+        return examRepository.paginate(currentPage, pageSize, queryWrapper);
     }
 
     /**

@@ -39,13 +39,12 @@ public class ExamResult {
     /**
      * 岗位 ID。
      */
-    @Id(keyType = KeyType.None)
     private Long vacancyId;
 
     /**
      * 该用户取得的总成绩，将实际成绩 * 100 存储，如 {@code 100} 分存储为 {@code 10,000}。
      */
-    private Integer totalScore;
+    private Integer score;
 
     /**
      * 用户完成考试的时间。
@@ -62,13 +61,13 @@ public class ExamResult {
 
         public final QueryColumn VACANCY_ID = new QueryColumn(this, "vacancy_id");
 
-        public final QueryColumn TOTAL_SCORE = new QueryColumn(this, "total_score");
+        public final QueryColumn SCORE = new QueryColumn(this, "score");
 
         public final QueryColumn COMPLETED_AT = new QueryColumn(this, "completed_at");
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, USER_ID, VACANCY_ID, TOTAL_SCORE, COMPLETED_AT};
+        public final QueryColumn[] DEFAULT_COLUMNS = {EXAM_ID, USER_ID, VACANCY_ID, SCORE, COMPLETED_AT};
 
         private ExamResultTableDef() {
             super("", "exam_result");
@@ -89,7 +88,7 @@ public class ExamResult {
                 .examId(String.valueOf(examId))
                 .userId(String.valueOf(userId))
                 .vacancyId(String.valueOf(vacancyId))
-                .totalScore(totalScore)
+                .score(score)
                 .completedAt(completedAt)
                 .build();
     }

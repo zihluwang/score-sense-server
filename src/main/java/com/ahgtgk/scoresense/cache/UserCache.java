@@ -15,11 +15,11 @@ public class UserCache {
     }
 
     public void putUser(User user) {
-        userRedisTemplate.opsForValue().set("totalScore-sense:user:" + user.getId(), user);
+        userRedisTemplate.opsForValue().set("score-sense:user:" + user.getId(), user);
     }
 
     public User getUser(Long id) {
-        return userRedisTemplate.opsForValue().get("totalScore-sense:user:" + id);
+        return userRedisTemplate.opsForValue().get("score-sense:user:" + id);
     }
 
 }

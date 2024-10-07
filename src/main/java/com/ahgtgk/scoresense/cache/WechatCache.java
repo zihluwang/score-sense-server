@@ -17,11 +17,11 @@ public class WechatCache {
 
     public void saveAccessToken(String accessToken) {
         redisTemplate.opsForValue()
-                .set("totalScore-sense:wechat:access-token", accessToken, Duration.ofSeconds(7200));
+                .set("score-sense:wechat:access-token", accessToken, Duration.ofSeconds(7200));
     }
 
     public String getAccessToken() {
-        return redisTemplate.opsForValue().get("totalScore-sense:wechat:access-token");
+        return redisTemplate.opsForValue().get("score-sense:wechat:access-token");
     }
 
 }

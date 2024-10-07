@@ -6,8 +6,10 @@ import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
 import com.ahgtgk.scoresense.model.request.*;
+import com.ahgtgk.scoresense.service.ExamResultService;
 import com.ahgtgk.scoresense.service.ExamService;
 import com.ahgtgk.scoresense.service.QuestionService;
+import com.ahgtgk.scoresense.view.ExamResultView;
 import com.ahgtgk.scoresense.view.ExamTypeView;
 import com.ahgtgk.scoresense.view.ExamView;
 import com.ahgtgk.scoresense.view.FullExamView;
@@ -29,11 +31,13 @@ public class ExamController {
 
     private final ExamService examService;
     private final QuestionService questionService;
+    private final ExamResultService examResultService;
 
     public ExamController(ExamService examService,
-                          QuestionService questionService) {
+                          QuestionService questionService, ExamResultService examResultService) {
         this.examService = examService;
         this.questionService = questionService;
+        this.examResultService = examResultService;
     }
 
     @GetMapping("/")
@@ -160,5 +164,9 @@ public class ExamController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/finish/{examId:\\d+}/{vacancyId:\\d+}")
+    public ExamResultView finishExam(@PathVariable Long examId, @PathVariable Long vacancyId) {
+        return examResultService.finishExam(examId, vacancyId).toView();
+    }
 
 }

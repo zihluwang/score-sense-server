@@ -9,7 +9,7 @@ public record ExamResultView(
         String examId,
         String userId,
         String vacancyId,
-        Integer totalScore,
+        Integer score,
         LocalDateTime completedAt
 ) {
 }

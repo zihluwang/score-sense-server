@@ -9,10 +9,7 @@ import com.ahgtgk.scoresense.model.request.*;
 import com.ahgtgk.scoresense.service.ExamResultService;
 import com.ahgtgk.scoresense.service.ExamService;
 import com.ahgtgk.scoresense.service.QuestionService;
-import com.ahgtgk.scoresense.view.ExamResultView;
-import com.ahgtgk.scoresense.view.ExamTypeView;
-import com.ahgtgk.scoresense.view.ExamView;
-import com.ahgtgk.scoresense.view.FullExamView;
+import com.ahgtgk.scoresense.view.*;
 import com.mybatisflex.core.paginate.Page;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -167,6 +165,14 @@ public class ExamController {
     @GetMapping("/finish/{examId:\\d+}/{vacancyId:\\d+}")
     public ExamResultView finishExam(@PathVariable Long examId, @PathVariable Long vacancyId) {
         return examResultService.finishExam(examId, vacancyId).toView();
+    }
+
+    @GetMapping("/{examId:\\d+}/solutions")
+    public List<QuestionView> getSolutions(@PathVariable Long examId) {
+        return questionService.getQuestionsWithSolution(examId)
+                .stream()
+                .map(BizQuestion::toView)
+                .toList();
     }
 
 }

@@ -129,6 +129,33 @@ public class QuestionService {
                 .toList();
     }
 
+    public List<BizQuestion> getQuestionsWithSolution(Long examId) {
+        var questions = questionRepository.selectListByQuery(QueryWrapper.create()
+                .where(Question.QUESTION.EXAM_ID.eq(examId))
+                .orderBy(Question.QUESTION.ID, true));
+        var options = optionRepository.selectListByQuery(QueryWrapper.create()
+                .where(Option.OPTION.EXAM_ID.eq(examId))
+                .orderBy(Option.OPTION.QUESTION_ID, true));
+        var solutions = solutionRepository.selectListByQuery(QueryWrapper.create()
+                .where(Solution.SOLUTION.EXAM_ID.eq(examId))
+                .orderBy(Solution.SOLUTION.QUESTION_ID, true));
+
+        return questions.stream()
+                .map((question) -> {
+                    var _options = options.stream()
+                            .filter((option) -> option.getQuestionId().equals(question.getId()))
+                            .map(Option::toBiz)
+                            .toList();
+                    var _solution = solutions.stream()
+                            .filter((solution) -> solution.getQuestionId().equals(question.getId()))
+                            .findFirst()
+                            .map(Solution::getSolutionText)
+                            .orElse(null);
+                    return question.toBiz(_solution, _options);
+                })
+                .toList();
+    }
+
     /**
      * 删除试题及其选项。
      *

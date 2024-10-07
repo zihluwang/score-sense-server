@@ -9,7 +9,6 @@ import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
-import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.core.table.TableDef;
 import lombok.*;
 
@@ -102,18 +101,7 @@ public class Question {
         }
     }
 
-    public BizQuestion toBiz() {
-        return BizQuestion.builder()
-                .id(id)
-                .type(type)
-                .answerType(answerType)
-                .questionText(questionText)
-                .imageId(imageId)
-                .maxScore(maxScore)
-                .build();
-    }
-
-    public BizQuestion toBiz(List<BizOption> options) {
+    public BizQuestion toBiz(String solution, List<BizOption> options) {
         return BizQuestion.builder()
                 .id(id)
                 .type(type)
@@ -122,10 +110,19 @@ public class Question {
                 .imageId(imageId)
                 .maxScore(maxScore)
                 .options(options)
+                .solution(solution)
                 .build();
     }
 
-    public QuestionView toView(List<OptionView> options) {
+    public BizQuestion toBiz(List<BizOption> options) {
+        return toBiz(null, options);
+    }
+
+    public BizQuestion toBiz() {
+        return toBiz(null, null);
+    }
+
+    public QuestionView toView(String solution, List<OptionView> options) {
         return QuestionView.builder()
                 .id(id)
                 .type(type)
@@ -134,11 +131,12 @@ public class Question {
                 .imageId(imageId)
                 .maxScore(maxScore)
                 .options(options)
+                .solution(solution)
                 .build();
     }
 
     public QuestionView toView() {
-        return toView(null);
+        return toView(null, null);
     }
 
 }

@@ -29,7 +29,8 @@ public class AuthenticationTokenFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         var token = request.getHeader("Authorization");
         if (Objects.isNull(token) || token.isBlank()) { // 没有令牌，提前结束
             filterChain.doFilter(request, response);

@@ -72,6 +72,10 @@ public class ExamService {
             }
         }
 
+        if (Objects.nonNull(criteria.status())) {
+            queryWrapper.and(Exam.EXAM.STATUS.eq(criteria.status()));
+        }
+
         queryWrapper.orderBy(Exam.EXAM.ID, false);
 
         return examRepository.paginate(currentPage, pageSize, queryWrapper);

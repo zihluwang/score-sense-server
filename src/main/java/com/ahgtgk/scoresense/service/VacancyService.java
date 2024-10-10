@@ -13,14 +13,12 @@ import com.mybatisflex.core.query.QueryWrapper;
 import com.onixbyte.guid.GuidCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -59,7 +57,7 @@ public class VacancyService {
         }
 
         // 设置地区 ID
-        if (Objects.nonNull(criteria.divisionCode()) && !criteria.name().isBlank()) {
+        if (Objects.nonNull(criteria.divisionCode()) && !criteria.divisionCode().isBlank()) {
             if (criteria.divisionCode().length() == 2) {
                 queryWrapper.and(Vacancy.VACANCY.PROVINCE.eq(criteria.divisionCode()));
             } else if (criteria.divisionCode().length() == 4) {

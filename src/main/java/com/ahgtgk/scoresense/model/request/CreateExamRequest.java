@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
+
 /**
  * 创建考试的请求。
  *
@@ -23,6 +25,8 @@ public record CreateExamRequest(
         String province,
         @NotBlank(message = "考试举办地不能为空")
         String prefecture,
-        Status status
+        Status status,
+        Integer baseNum,
+        LocalDateTime releasedAt
 ) {
 }

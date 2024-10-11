@@ -4,6 +4,8 @@ import com.ahgtgk.scoresense.enumeration.Status;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
+import java.time.LocalDateTime;
+
 @Builder
 public record UpdateExamRequest(
         @NotNull(message = "考试 ID 不能为空")
@@ -13,6 +15,8 @@ public record UpdateExamRequest(
         String description,
         String province,
         String prefecture,
-        Status status
+        Status status,
+        Integer baseNum,
+        LocalDateTime releasedAt
 ) {
 }

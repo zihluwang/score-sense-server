@@ -29,6 +29,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -124,6 +125,8 @@ public class ExamService {
                 .status(Status.ENABLED)
                 .province(request.province())
                 .prefecture(request.prefecture())
+                .baseNum(Optional.ofNullable(request.baseNum()).orElse(0))
+                .releasedAt(Optional.ofNullable(request.releasedAt()).orElse(LocalDateTime.now()))
                 .build();
 
         // 执行创建
@@ -163,6 +166,12 @@ public class ExamService {
 
         Optional.ofNullable(request.status())
                 .ifPresent(examBuilder::status);
+
+        Optional.ofNullable(request.baseNum())
+                .ifPresent(examBuilder::baseNum);
+
+        Optional.ofNullable(request.releasedAt())
+                .ifPresent(examBuilder::releasedAt);
 
         examRepository.update(examBuilder.build(), true);
     }

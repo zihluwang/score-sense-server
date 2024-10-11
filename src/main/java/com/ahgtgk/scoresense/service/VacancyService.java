@@ -1,10 +1,12 @@
 package com.ahgtgk.scoresense.service;
 
+import com.ahgtgk.scoresense.config.ConcurrentConfig;
 import com.ahgtgk.scoresense.entity.ExamVacancy;
 import com.ahgtgk.scoresense.entity.Prefecture;
 import com.ahgtgk.scoresense.entity.Province;
 import com.ahgtgk.scoresense.entity.Vacancy;
 import com.ahgtgk.scoresense.exception.BizException;
+import com.ahgtgk.scoresense.model.biz.BizVacancy;
 import com.ahgtgk.scoresense.model.criteria.SearchVacancyCriteria;
 import com.ahgtgk.scoresense.model.request.CreateVacancyRequest;
 import com.ahgtgk.scoresense.model.request.UpdateVacancyRequest;
@@ -22,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -95,8 +98,12 @@ public class VacancyService {
      *
      * @param vacancyId 岗位 ID
      */
-    public Vacancy getVacancy(Long vacancyId) {
-        return vacancyRepository.selectOneById(vacancyId);
+    public BizVacancy getVacancy(Long vacancyId) {
+        var getExamIdsTask = CompletableFuture.supplyAsync(
+                () -> examVacancyService.getExamsByVacancyId(vacancyId),
+                ConcurrentConfig.CACHED_EXECUTORS
+        );
+        return vacancyRepository.selectOneById(vacancyId).toBiz(getExamIdsTask.join());
     }
 
     /**

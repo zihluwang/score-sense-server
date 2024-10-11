@@ -1,12 +1,15 @@
 package com.ahgtgk.scoresense.entity;
 
-import com.ahgtgk.scoresense.view.VacancyView;
+import com.ahgtgk.scoresense.model.biz.BizVacancy;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
 import lombok.*;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * 岗位信息
@@ -60,13 +63,18 @@ public class Vacancy {
         }
     }
 
-    public VacancyView toView() {
-        return VacancyView.builder()
-                .id(String.valueOf(id))
+    public BizVacancy toBiz(List<Long> examIds) {
+        return BizVacancy.builder()
+                .id(id)
                 .name(name)
                 .province(province)
                 .prefecture(prefecture)
+                .examIds(examIds.stream().map(String::valueOf).toList())
                 .build();
+    }
+
+    public BizVacancy toBiz() {
+        return toBiz(Collections.emptyList());
     }
 
 }

@@ -55,4 +55,13 @@ public class ExamVacancyService {
         examVacancyRepository.deleteByCondition(ExamVacancy.EXAM_VACANCY.EXAM_ID.eq(examId));
     }
 
+    /**
+     * 根据岗位 ID 获取绑定的考试信息。
+     *
+     * @param vacancyId 岗位 ID
+     */
+    public List<Long> getExamsByVacancyId(Long vacancyId) {
+        return examVacancyRepository.selectExamsByVacancyId(vacancyId);
+    }
+
 }

@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.controller;
 
+import com.ahgtgk.scoresense.config.ConcurrentConfig;
 import com.ahgtgk.scoresense.entity.Exam;
 import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.exception.BizException;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @RestController
@@ -106,6 +108,11 @@ public class ExamController {
         // 获取考试信息
         var exam = examService.getExam(examId);
 
+        var preParticipateExamTask = CompletableFuture.runAsync(
+                () -> examService.participateExam(examId),
+                ConcurrentConfig.CACHED_EXECUTORS
+        );
+
         // 获取考试题目
         var questions = questionService.getQuestions(examId)
                 .stream()
@@ -116,6 +123,9 @@ public class ExamController {
                     question.setOptions(options);
                 })
                 .toList();
+
+        // 等待预备考试结果
+        preParticipateExamTask.join();
 
         return FullExamView.builder()
                 .id(String.valueOf(exam.getId()))
@@ -172,6 +182,14 @@ public class ExamController {
         return questionService.getQuestionsWithSolution(examId)
                 .stream()
                 .map(BizQuestion::toView)
+                .toList();
+    }
+
+    @GetMapping("/historical")
+    public List<ExamView> getHistoricalExams() {
+        return examService.getHistoricalExams()
+                .stream()
+                .map(Exam::toView)
                 .toList();
     }
 

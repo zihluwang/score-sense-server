@@ -65,7 +65,7 @@ public class ExamResultService {
                 .vacancyId(vacancyId)
                 .score(totalScore)
                 .build();
-        examResultRepository.insertOrUpdate(examResult);
+        examResultRepository.update(examResult);
         return examResult;
     }
 
@@ -212,5 +212,4 @@ public class ExamResultService {
         var userId = userService.getCurrentUser().getId();
         return examResultRepository.selectTop15Users(examId, userId);
     }
-
 }

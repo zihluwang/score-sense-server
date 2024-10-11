@@ -1,6 +1,7 @@
 package com.ahgtgk.scoresense.service;
 
 import com.ahgtgk.scoresense.entity.Exam;
+import com.ahgtgk.scoresense.entity.ExamResult;
 import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.enumeration.Status;
@@ -14,6 +15,7 @@ import com.ahgtgk.scoresense.model.request.CreateExamTypeRequest;
 import com.ahgtgk.scoresense.model.request.UpdateExamRequest;
 import com.ahgtgk.scoresense.model.request.UpdateExamTypeRequest;
 import com.ahgtgk.scoresense.repository.ExamRepository;
+import com.ahgtgk.scoresense.repository.ExamResultRepository;
 import com.ahgtgk.scoresense.repository.ExamTypeRepository;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -37,14 +39,24 @@ public class ExamService {
     private final ExamVacancyService examVacancyService;
     private final SequenceService sequenceService;
     private final ExamTypeRepository examTypeRepository;
+    private final UserService userService;
+    private final ExamResultRepository examResultRepository;
 
     @Autowired
-    public ExamService(ExamRepository examRepository, GuidCreator<Long> examIdCreator, ExamVacancyService examVacancyService, SequenceService sequenceService, ExamTypeRepository examTypeRepository) {
+    public ExamService(ExamRepository examRepository,
+                       GuidCreator<Long> examIdCreator,
+                       ExamVacancyService examVacancyService,
+                       SequenceService sequenceService,
+                       ExamTypeRepository examTypeRepository,
+                       UserService userService,
+                       ExamResultRepository examResultRepository) {
         this.examRepository = examRepository;
         this.examIdCreator = examIdCreator;
         this.examVacancyService = examVacancyService;
         this.sequenceService = sequenceService;
         this.examTypeRepository = examTypeRepository;
+        this.userService = userService;
+        this.examResultRepository = examResultRepository;
     }
 
     private final static String SEQ_KEY = "exam_type";
@@ -330,5 +342,28 @@ public class ExamService {
         }
 
         examTypeRepository.deleteById(examTypeId);
+    }
+
+    @Transactional
+    public void participateExam(Long examId) {
+        var currentUser = userService.getCurrentUser();
+
+        var examResult = ExamResult.builder()
+                .vacancyId(0L) // 暂时先不记录岗位信息
+                .userId(currentUser.getId())
+                .examId(examId)
+                .score(0)
+                .build();
+        examResultRepository.insert(examResult);
+    }
+
+    public List<Exam> getHistoricalExams() {
+        var user = userService.getCurrentUser();
+        return examRepository.selectListByQuery(QueryWrapper.create()
+                .from(Exam.EXAM)
+                .join(ExamResult.EXAM_RESULT).on(Exam.EXAM.ID.eq(ExamResult.EXAM_RESULT.EXAM_ID))
+                .where(ExamResult.EXAM_RESULT.USER_ID.eq(user.getId()))
+                .and(ExamResult.EXAM_RESULT.COMPLETED_AT.isNull())
+                .orderBy(Exam.EXAM.ID, false));
     }
 }

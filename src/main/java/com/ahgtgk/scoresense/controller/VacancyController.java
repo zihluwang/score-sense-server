@@ -2,6 +2,7 @@ package com.ahgtgk.scoresense.controller;
 
 import com.ahgtgk.scoresense.entity.Vacancy;
 import com.ahgtgk.scoresense.exception.BizException;
+import com.ahgtgk.scoresense.model.biz.BizVacancy;
 import com.ahgtgk.scoresense.model.criteria.SearchVacancyCriteria;
 import com.ahgtgk.scoresense.model.request.CreateVacancyRequest;
 import com.ahgtgk.scoresense.model.request.UpdateVacancyRequest;
@@ -41,7 +42,8 @@ public class VacancyController {
                                           @RequestParam(defaultValue = "10") Integer pageSize,
                                           @ModelAttribute SearchVacancyCriteria criteria) {
         return vacancyService.getVacancies(currentPage, pageSize, criteria)
-                .map(Vacancy::toView);
+                .map(Vacancy::toBiz)
+                .map(BizVacancy::toView);
     }
 
     @GetMapping("/by-exam/{examId:\\d+}")
@@ -49,7 +51,8 @@ public class VacancyController {
                                                   @RequestParam(defaultValue = "10") Integer pageSize,
                                                   @PathVariable Long examId) {
         return vacancyService.getVacanciesByExamId(currentPage, pageSize, examId)
-                .map(Vacancy::toView);
+                .map(Vacancy::toBiz)
+                .map(BizVacancy::toView);
     }
 
     /**
@@ -69,7 +72,7 @@ public class VacancyController {
      */
     @PostMapping("/")
     public VacancyView createVacancy(@Valid @RequestBody CreateVacancyRequest request) {
-        return vacancyService.createVacancy(request).toView();
+        return vacancyService.createVacancy(request).toBiz().toView();
     }
 
     /**

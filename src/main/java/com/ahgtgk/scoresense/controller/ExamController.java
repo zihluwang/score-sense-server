@@ -49,8 +49,21 @@ public class ExamController {
     }
 
     @GetMapping("/{examId:\\d+}")
-    public ExamView getExam(@PathVariable Long examId) {
-        return examService.getExam(examId).toView();
+    public FullExamView getExam(@PathVariable Long examId) {
+        var exam = examService.getExam(examId);
+
+        var questions = questionService.getQuestions(examId);
+
+        return FullExamView.builder()
+                .id(String.valueOf(exam.getId()))
+                .name(exam.getName())
+                .description(exam.getDescription())
+                .province(exam.getProvince())
+                .prefecture(exam.getPrefecture())
+                .status(exam.getStatus().getCode())
+                .type(exam.getType())
+                .questions(questions.stream().map(BizQuestion::toView).toList())
+                .build();
     }
 
     @PostMapping("/")

@@ -44,6 +44,14 @@ public class VacancyController {
                 .map(Vacancy::toView);
     }
 
+    @GetMapping("/by-exam/{examId:\\d+}")
+    public Page<VacancyView> getVacanciesByExamId(@RequestParam(defaultValue = "1") Integer currentPage,
+                                                  @RequestParam(defaultValue = "10") Integer pageSize,
+                                                  @PathVariable Long examId) {
+        return vacancyService.getVacanciesByExamId(currentPage, pageSize, examId)
+                .map(Vacancy::toView);
+    }
+
     /**
      * 获取指定岗位信息。
      *

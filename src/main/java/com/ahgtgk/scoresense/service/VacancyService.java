@@ -1,5 +1,6 @@
 package com.ahgtgk.scoresense.service;
 
+import com.ahgtgk.scoresense.entity.ExamVacancy;
 import com.ahgtgk.scoresense.entity.Prefecture;
 import com.ahgtgk.scoresense.entity.Province;
 import com.ahgtgk.scoresense.entity.Vacancy;
@@ -67,6 +68,24 @@ public class VacancyService {
 
         // 设置根据岗位 ID 倒序排列
         queryWrapper.orderBy(Vacancy.VACANCY.ID, false);
+
+        return vacancyRepository.paginate(currentPage, pageSize, queryWrapper);
+    }
+
+    /**
+     * 分页查询岗位信息。
+     *
+     * @param currentPage 当前页面
+     * @param pageSize    页面数据量
+     * @param examId      考试 ID
+     */
+    public Page<Vacancy> getVacanciesByExamId(Integer currentPage, Integer pageSize, Long examId) {
+        var queryWrapper = QueryWrapper.create()
+                .from(Vacancy.VACANCY)
+                .join(ExamVacancy.EXAM_VACANCY)
+                .on(ExamVacancy.EXAM_VACANCY.VACANCY_ID.eq(Vacancy.VACANCY.ID))
+                .where(ExamVacancy.EXAM_VACANCY.EXAM_ID.eq(examId))
+                .orderBy(Vacancy.VACANCY.ID, false); // 设置根据岗位 ID 倒序排列
 
         return vacancyRepository.paginate(currentPage, pageSize, queryWrapper);
     }

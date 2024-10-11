@@ -7,6 +7,7 @@ import com.ahgtgk.scoresense.enumeration.AnswerType;
 import com.ahgtgk.scoresense.enumeration.Status;
 import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.exception.DataConflictException;
+import com.ahgtgk.scoresense.model.biz.BizClientExam;
 import com.ahgtgk.scoresense.model.biz.BizOption;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
@@ -305,14 +306,22 @@ public class ExamService {
      * @param pageSize    页面大小
      * @param examTypeId  考试类型 ID
      */
-    public Page<Exam> getExamsByExamType(Integer currentPage, Integer pageSize, Long examTypeId) {
+    public Page<BizClientExam> getExamsByExamType(Integer currentPage, Integer pageSize, Long examTypeId) {
         var queryWrapper = QueryWrapper.create();
         if (examTypeId != 0) {
             queryWrapper.where(Exam.EXAM.TYPE.eq(examTypeId));
         }
         queryWrapper.and(Exam.EXAM.STATUS.eq(Status.ENABLED));
         queryWrapper.orderBy(Exam.EXAM.ID, false);
-        return examRepository.paginate(currentPage, pageSize, queryWrapper);
+        var page = examRepository.paginate(currentPage, pageSize, queryWrapper);
+        var examResults = examResultRepository.selectListByCondition(ExamResult.EXAM_RESULT
+                .EXAM_ID.in(page.getRecords().stream().map(Exam::getId).toList()));
+        return page.map((exam) -> {
+            var examResultCount = Long.valueOf(examResults.stream()
+                    .filter((examResult) -> examResult.getExamId().equals(exam.getId()))
+                    .count());
+            return exam.toClientBiz(examResultCount.intValue());
+        });
     }
 
     /**

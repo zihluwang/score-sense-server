@@ -4,6 +4,7 @@ import com.ahgtgk.scoresense.config.ConcurrentConfig;
 import com.ahgtgk.scoresense.entity.Exam;
 import com.ahgtgk.scoresense.entity.ExamType;
 import com.ahgtgk.scoresense.exception.BizException;
+import com.ahgtgk.scoresense.model.biz.BizClientExam;
 import com.ahgtgk.scoresense.model.biz.BizQuestion;
 import com.ahgtgk.scoresense.model.criteria.SearchExamCriteria;
 import com.ahgtgk.scoresense.model.request.*;
@@ -153,11 +154,11 @@ public class ExamController {
     }
 
     @GetMapping("/types/{examTypeId:\\d+}")
-    public Page<ExamView> getExamsByExamType(@RequestParam(defaultValue = "1") Integer currentPage,
+    public Page<ClientExamView> getExamsByExamType(@RequestParam(defaultValue = "1") Integer currentPage,
                                              @RequestParam(defaultValue = "10") Integer pageSize,
                                              @PathVariable Long examTypeId) {
         return examService.getExamsByExamType(currentPage, pageSize, examTypeId)
-                .map(Exam::toView);
+                .map(BizClientExam::toView);
     }
 
     @PatchMapping("/types")

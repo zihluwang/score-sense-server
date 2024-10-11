@@ -1,13 +1,16 @@
 package com.ahgtgk.scoresense.entity;
 
 import com.ahgtgk.scoresense.enumeration.Status;
+import com.ahgtgk.scoresense.model.biz.BizClientExam;
+import com.ahgtgk.scoresense.view.ExamView;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import com.mybatisflex.core.query.QueryColumn;
 import com.mybatisflex.core.table.TableDef;
-import com.ahgtgk.scoresense.view.ExamView;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 /**
  * 考试，存储考试的基本信息。
@@ -55,9 +58,16 @@ public class Exam {
     private String prefecture;
 
     /**
-     * 考试的状态
+     * 数据的展示基数。
+     */
+    private Integer baseNum;
+
+    /**
+     * 考试的状态。
      */
     private Status status;
+
+    private LocalDateTime releasedAt;
 
     public static final ExamTableDef EXAM = new ExamTableDef();
 
@@ -70,6 +80,19 @@ public class Exam {
                 .province(province)
                 .prefecture(prefecture)
                 .status(status.getCode())
+                .build();
+    }
+
+    public BizClientExam toClientBiz(Integer attendeeCount) {
+        return BizClientExam.builder()
+                .id(id)
+                .name(name)
+                .type(type)
+                .description(description)
+                .province(province)
+                .prefecture(prefecture)
+                .status(status)
+                .attendeeCount(baseNum + attendeeCount)
                 .build();
     }
 
@@ -87,11 +110,16 @@ public class Exam {
 
         public final QueryColumn PREFECTURE = new QueryColumn(this, "prefecture");
 
+        public final QueryColumn BASE_NUM = new QueryColumn(this, "base_num");
+
         public final QueryColumn STATUS = new QueryColumn(this, "status");
+
+        public final QueryColumn RELEASED_AT = new QueryColumn(this, "released_at");
 
         public final QueryColumn ALL_COLUMNS = new QueryColumn(this, "*");
 
-        public final QueryColumn[] DEFAULT_COLUMNS = {ID, NAME, TYPE, DESCRIPTION, PROVINCE, PREFECTURE, STATUS};
+        public final QueryColumn[] DEFAULT_COLUMNS = {ID, NAME, TYPE, DESCRIPTION, PROVINCE, PREFECTURE, BASE_NUM,
+                STATUS, RELEASED_AT};
 
         private ExamTableDef() {
             super("", "exam");

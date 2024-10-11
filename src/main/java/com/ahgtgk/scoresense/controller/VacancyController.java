@@ -1,11 +1,13 @@
 package com.ahgtgk.scoresense.controller;
 
+import com.ahgtgk.scoresense.entity.ExamVacancy;
 import com.ahgtgk.scoresense.entity.Vacancy;
 import com.ahgtgk.scoresense.exception.BizException;
 import com.ahgtgk.scoresense.model.biz.BizVacancy;
 import com.ahgtgk.scoresense.model.criteria.SearchVacancyCriteria;
 import com.ahgtgk.scoresense.model.request.CreateVacancyRequest;
 import com.ahgtgk.scoresense.model.request.UpdateVacancyRequest;
+import com.ahgtgk.scoresense.service.ExamVacancyService;
 import com.ahgtgk.scoresense.service.VacancyService;
 import com.ahgtgk.scoresense.view.VacancyView;
 import com.mybatisflex.core.paginate.Page;
@@ -25,9 +27,11 @@ import java.io.IOException;
 public class VacancyController {
 
     private final VacancyService vacancyService;
+    private final ExamVacancyService examVacancyService;
 
-    public VacancyController(VacancyService vacancyService) {
+    public VacancyController(VacancyService vacancyService, ExamVacancyService examVacancyService) {
         this.vacancyService = vacancyService;
+        this.examVacancyService = examVacancyService;
     }
 
     /**
@@ -41,8 +45,15 @@ public class VacancyController {
     public Page<VacancyView> getVacancies(@RequestParam(defaultValue = "1") Integer currentPage,
                                           @RequestParam(defaultValue = "10") Integer pageSize,
                                           @ModelAttribute SearchVacancyCriteria criteria) {
-        return vacancyService.getVacancies(currentPage, pageSize, criteria)
-                .map(Vacancy::toBiz)
+        var vacancies = vacancyService.getVacancies(currentPage, pageSize, criteria);
+        var vacancyIds = vacancies.getRecords().stream()
+                .map(Vacancy::getId)
+                .toList();
+
+        var examVacancies = examVacancyService.getExamIdsByVacancyIds(vacancyIds);
+        return vacancies.map((vacancy) -> vacancy.toBiz(examVacancies.stream()
+                        .filter((examVacancy) -> examVacancy.getVacancyId().equals(vacancy.getId()))
+                        .map(ExamVacancy::getExamId).toList()))
                 .map(BizVacancy::toView);
     }
 

@@ -64,4 +64,11 @@ public class ExamVacancyService {
         return examVacancyRepository.selectExamsByVacancyId(vacancyId);
     }
 
+    /**
+     * 根据岗位 ID 获取绑定的考试信息。
+     */
+    public List<ExamVacancy> getExamIdsByVacancyIds(List<Long> vacancyIds) {
+        return examVacancyRepository.selectListByCondition(ExamVacancy.EXAM_VACANCY.VACANCY_ID.in(vacancyIds));
+    }
+
 }

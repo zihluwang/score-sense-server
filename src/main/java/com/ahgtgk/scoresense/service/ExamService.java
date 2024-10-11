@@ -363,7 +363,7 @@ public class ExamService {
                 .from(Exam.EXAM)
                 .join(ExamResult.EXAM_RESULT).on(Exam.EXAM.ID.eq(ExamResult.EXAM_RESULT.EXAM_ID))
                 .where(ExamResult.EXAM_RESULT.USER_ID.eq(user.getId()))
-                .and(ExamResult.EXAM_RESULT.COMPLETED_AT.isNull())
+                .and(Exam.EXAM.STATUS.eq(Status.ENABLED))
                 .orderBy(Exam.EXAM.ID, false));
     }
 }

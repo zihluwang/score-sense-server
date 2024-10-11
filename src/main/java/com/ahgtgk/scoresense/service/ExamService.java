@@ -315,13 +315,27 @@ public class ExamService {
      * @param pageSize    页面大小
      * @param examTypeId  考试类型 ID
      */
-    public Page<BizClientExam> getExamsByExamType(Integer currentPage, Integer pageSize, Long examTypeId) {
+    public Page<BizClientExam> getExamsByExamType(Integer currentPage,
+                                                  Integer pageSize,
+                                                  Long examTypeId,
+                                                  String divisionCode) {
         var queryWrapper = QueryWrapper.create();
         if (examTypeId != 0) {
             queryWrapper.where(Exam.EXAM.TYPE.eq(examTypeId));
         }
+
+        Optional.ofNullable(divisionCode)
+                .filter((_divisionCode) -> !_divisionCode.isBlank())
+                .ifPresent((_divisionCode) -> {
+                    if (_divisionCode.length() == 2) {
+                        queryWrapper.and(Exam.EXAM.PROVINCE.eq(_divisionCode));
+                    } else if (_divisionCode.length() == 4) {
+                        queryWrapper.and(Exam.EXAM.PREFECTURE.eq(_divisionCode));
+                    }
+                });
         queryWrapper.and(Exam.EXAM.STATUS.eq(Status.ENABLED));
         queryWrapper.orderBy(Exam.EXAM.ID, false);
+
         var page = examRepository.paginate(currentPage, pageSize, queryWrapper);
         var examResults = examResultRepository.selectListByCondition(ExamResult.EXAM_RESULT
                 .EXAM_ID.in(page.getRecords().stream().map(Exam::getId).toList()));

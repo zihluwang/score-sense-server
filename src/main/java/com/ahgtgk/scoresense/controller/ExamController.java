@@ -155,9 +155,10 @@ public class ExamController {
 
     @GetMapping("/types/{examTypeId:\\d+}")
     public Page<ClientExamView> getExamsByExamType(@RequestParam(defaultValue = "1") Integer currentPage,
-                                             @RequestParam(defaultValue = "10") Integer pageSize,
-                                             @PathVariable Long examTypeId) {
-        return examService.getExamsByExamType(currentPage, pageSize, examTypeId)
+                                                   @RequestParam(defaultValue = "10") Integer pageSize,
+                                                   @PathVariable Long examTypeId,
+                                                   @RequestParam String divisionCode) {
+        return examService.getExamsByExamType(currentPage, pageSize, examTypeId, divisionCode)
                 .map(BizClientExam::toView);
     }
 

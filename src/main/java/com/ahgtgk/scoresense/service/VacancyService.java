@@ -212,7 +212,7 @@ public class VacancyService {
 
         var vacancies = new ArrayList<Vacancy>();
         for (var row : sheet) {
-            if (row.getRowNum() == 0) {
+            if (row.getRowNum() <= 0) {
                 continue;
             }
 

@@ -179,6 +179,8 @@ public class VacancyService {
         // 绑定岗位与考试信息
         if (Objects.nonNull(request.examIds()) && !request.examIds().isEmpty()) {
             examVacancyService.bindExamsToVacancy(vacancy.getId(), request.examIds());
+        } else {
+            examVacancyService.deleteByVacancyId(vacancy.getId());
         }
 
         return vacancy;

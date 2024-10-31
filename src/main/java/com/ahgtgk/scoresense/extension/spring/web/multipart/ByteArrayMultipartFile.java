@@ -39,7 +39,12 @@ public class ByteArrayMultipartFile implements MultipartFile {
     @NonNull
     @Override
     public String getOriginalFilename() {
-        return name;
+        var ext = switch (contentType) {
+            case "application/json" -> ".json";
+            case "image/jpeg" -> ".jpg";
+            default -> "";
+        };
+        return name + ext;
     }
 
     @Override

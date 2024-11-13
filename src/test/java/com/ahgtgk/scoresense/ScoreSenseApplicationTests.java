@@ -18,9 +18,12 @@ import org.springframework.test.context.ActiveProfiles;
 @ActiveProfiles({"db", "wechat", "dev", "cache"})
 class ScoreSenseApplicationTests {
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     @Test
     void contextLoads() {
-
+        System.out.println(passwordEncoder.encode("123456"));
     }
 
 }
